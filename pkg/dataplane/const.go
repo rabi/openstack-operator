@@ -75,4 +75,7 @@ const (
 	//AllNodeSets Key used in nodeset service map for all nodesets when
 	//using serviceOverride.
 	AllNodeSets = "AllNodeSets"
+	
+	// IPSetOwnershipLabelKey label key to find all IPSets for OpenStackDataPlaneNodeSet
+	IPSetOwnershipLabelKey = "nodeset/name"
 )
