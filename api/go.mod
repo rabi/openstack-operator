@@ -10,7 +10,7 @@ require (
 	github.com/openstack-k8s-operators/barbican-operator/api v0.6.1-0.20260207183409-130c1eea6933
 	github.com/openstack-k8s-operators/cinder-operator/api v0.6.1-0.20260207170736-b66ff139c9c4
 	github.com/openstack-k8s-operators/designate-operator/api v0.6.1-0.20260207180902-7fad9ff72272
-	github.com/openstack-k8s-operators/glance-operator/api v0.6.1-0.20260206173306-e0a322fced68
+	github.com/openstack-k8s-operators/glance-operator/api v0.6.1-0.20260207191004-c3d99b4efdeb
 	github.com/openstack-k8s-operators/heat-operator/api v0.6.1-0.20260207082315-6c0673338be7
 	github.com/openstack-k8s-operators/horizon-operator/api v0.6.1-0.20260207170736-4c115ead3902
 	github.com/openstack-k8s-operators/infra-operator/apis v0.6.1-0.20260207181431-4cd3852ec206
@@ -27,7 +27,7 @@ require (
 	github.com/openstack-k8s-operators/ovn-operator/api v0.6.1-0.20260207170737-d45766413365
 	github.com/openstack-k8s-operators/placement-operator/api v0.6.1-0.20260207164744-4bfa441fbbd4
 	github.com/openstack-k8s-operators/swift-operator/api v0.6.1-0.20260207165622-521532674ed9
-	github.com/openstack-k8s-operators/telemetry-operator/api v0.6.1-0.20260206181610-fe8dc27febad
+	github.com/openstack-k8s-operators/telemetry-operator/api v0.6.1-0.20260208172501-be2ddf1f7aa2
 	github.com/openstack-k8s-operators/watcher-operator/api v0.6.1-0.20260207082017-e2c9f69be82c
 	github.com/rhobs/obo-prometheus-operator/pkg/apis/monitoring v0.71.0-rhobs1 // indirect
 	github.com/rhobs/observability-operator v0.3.1 // indirect
