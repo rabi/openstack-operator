@@ -216,6 +216,14 @@ func ReconcileManila(ctx context.Context, instance *corev1beta1.OpenStackControl
 			//manila.Spec.DatabaseInstance = instance.Name // name of MariaDB we create here
 			manila.Spec.DatabaseInstance = "openstack" //FIXME: see above
 		}
+		if manila.GetAnnotations() == nil {
+			manila.SetAnnotations(make(map[string]string))
+		}
+		if version.Status.ServiceDefaults.ManilaSharev1 != nil && *version.Status.ServiceDefaults.ManilaSharev1 == "true" {
+			manila.GetAnnotations()[manilav1.ManilaShareV1Label] = "true"
+		} else {
+			manila.GetAnnotations()[manilav1.ManilaShareV1Label] = "false"
+		}
 		// Append globally defined extraMounts to the service's own list.
 		for _, ev := range instance.Spec.ExtraMounts {
 			manila.Spec.ExtraMounts = append(manila.Spec.ExtraMounts, manilav1.ManilaExtraVolMounts{

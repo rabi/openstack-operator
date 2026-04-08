@@ -180,6 +180,7 @@ type ServiceDefaults struct {
 	GlanceWsgi      *string `json:"glanceWsgi,omitempty"`
 	RabbitmqVersion *string `json:"rabbitmqVersion,omitempty"`
 	GlanceLocationAPI *string `json:"glanceLocationAPI,omitempty"`
+	ManilaSharev1   *string `json:"manilaSharev1,omitempty"`
 }
 
 // OpenStackVersionStatus defines the observed state of OpenStackVersion
