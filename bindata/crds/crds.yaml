@@ -21474,6 +21474,8 @@ spec:
               availableServiceDefaults:
                 additionalProperties:
                   properties:
+                    glanceLocationAPI:
+                      type: string
                     glanceWsgi:
                       type: string
                     rabbitmqVersion:
@@ -21911,6 +21913,8 @@ spec:
                 type: integer
               serviceDefaults:
                 properties:
+                  glanceLocationAPI:
+                    type: string
                   glanceWsgi:
                     type: string
                   rabbitmqVersion:
