@@ -232,6 +232,9 @@ func InitializeOpenStackVersionServiceDefaults(ctx context.Context) *corev1beta1
 	trueString := "true"
 	defaults.GlanceWsgi = &trueString            // all new glance deployments use WSGI by default (FR3 and later)
 	defaults.GlanceLocationAPI = ptr.To("false") // disable location-api for RHOSO 18: this boolean can be switched to true with RHOSO 19 release
+	// NOTE: In 18 Manila creates sharev1 service and endpoints. From 19 do not create sharev1 anymore
+	// https://review.opendev.org/q/topic:%22remove-v1%22+and+project:openstack/manila
+	defaults.ManilaSharev1 = &trueString // all Manila deployments create sharev1 endpoints by default
 
 	versionString := "4.2"
 	defaults.RabbitmqVersion = &versionString // all new rabbitmq deployments will have rabbitmq-server 4.2 (FR5)

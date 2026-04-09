@@ -21478,6 +21478,8 @@ spec:
                       type: string
                     glanceWsgi:
                       type: string
+                    manilaSharev1:
+                      type: string
                     rabbitmqVersion:
                       type: string
                   type: object
@@ -21916,6 +21918,8 @@ spec:
                   glanceLocationAPI:
                     type: string
                   glanceWsgi:
+                    type: string
+                  manilaSharev1:
                     type: string
                   rabbitmqVersion:
                     type: string
