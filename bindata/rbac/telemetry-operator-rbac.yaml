@@ -325,9 +325,9 @@ rules:
     - list
     - watch
 - apiGroups:
-    - rabbitmq.com
+    - rabbitmq.openstack.org
   resources:
-    - rabbitmqclusters
+    - rabbitmqs
   verbs:
     - get
     - list
