@@ -210,7 +210,7 @@ spec:
                 - custom-tls-dns
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: tls-dns-ips-openstack-edpm-tls-ovrd-openstack-edpm-tls
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -324,7 +324,7 @@ spec:
                 - custom-tls-dns
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: custom-tls-dns-openstack-edpm-tls-ovrd-openstack-edpm-tls
         resources: {}
         terminationMessagePath: /dev/termination-log

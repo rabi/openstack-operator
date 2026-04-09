@@ -200,7 +200,7 @@ spec:
             edpm_service_type: install-certs-ovrd
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: install-certs-ovrd-openstack-edpm-tls-openstack-edpm-tls
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -334,7 +334,7 @@ spec:
             edpm_service_type: tls-dnsnames
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: tls-dnsnames-openstack-edpm-tls-openstack-edpm-tls
         resources: {}
         terminationMessagePath: /dev/termination-log

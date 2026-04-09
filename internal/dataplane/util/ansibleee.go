@@ -102,7 +102,7 @@ func (a *EEJob) JobForOpenStackAnsibleEE(h *helper.Helper) (*batchv1.Job, error)
 	podSpec := corev1.PodSpec{
 		RestartPolicy: corev1.RestartPolicyNever,
 		Containers: []corev1.Container{{
-			ImagePullPolicy: corev1.PullAlways,
+			ImagePullPolicy: corev1.PullIfNotPresent,
 			Image:           a.Image,
 			Name:            a.Name,
 			Args:            args,

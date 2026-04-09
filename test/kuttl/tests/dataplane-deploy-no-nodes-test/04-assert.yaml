@@ -128,7 +128,7 @@ spec:
                 - ovn
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: ovn-edpm-compute-no-nodes-updated-ovn-cm-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
