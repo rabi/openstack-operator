@@ -255,6 +255,7 @@ rules:
 - apiGroups:
   - config.openshift.io
   resources:
+  - clusterimagepolicies
   - imagedigestmirrorsets
   - images
   - networks

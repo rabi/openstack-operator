@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"testing"
 
 	. "github.com/onsi/gomega" //revive:disable:dot-imports
@@ -30,8 +31,11 @@ import (
 	"github.com/openstack-k8s-operators/lib-common/modules/common/helper"
 	corev1 "github.com/openstack-k8s-operators/openstack-operator/api/core/v1beta1"
 	k8s_corev1 "k8s.io/api/core/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -44,6 +48,7 @@ import (
 func setupTestHelper(includeOpenShiftCRDs bool, objects ...client.Object) *helper.Helper {
 	s := runtime.NewScheme()
 	_ = scheme.AddToScheme(s)
+	_ = apiextensionsv1.AddToScheme(s)
 	_ = corev1.AddToScheme(s)
 	_ = k8s_corev1.AddToScheme(s)
 
@@ -235,6 +240,135 @@ func TestHasMirrorRegistries_CRDsNotInstalled(t *testing.T) {
 	hasMirrors, err := HasMirrorRegistries(ctx, h)
 	g.Expect(err).ToNot(HaveOccurred(), "Should not return error when CRDs don't exist")
 	g.Expect(hasMirrors).To(BeFalse(), "Should return false when CRDs don't exist (graceful degradation)")
+}
+
+func TestGetMirrorRegistryScopes(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	idms := &ocpidms.ImageDigestMirrorSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "test-idms",
+		},
+		Spec: ocpidms.ImageDigestMirrorSetSpec{
+			ImageDigestMirrors: []ocpidms.ImageDigestMirrors{
+				{
+					Source: "registry.redhat.io/rhosp-dev-preview",
+					Mirrors: []ocpidms.ImageMirror{
+						"mirror.example.com:5000/rhosp-dev-preview",
+						"mirror.example.com:5000/rhosp-dev-preview",
+					},
+				},
+			},
+		},
+	}
+	icsp := &ocpicsp.ImageContentSourcePolicy{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "test-icsp",
+		},
+		Spec: ocpicsp.ImageContentSourcePolicySpec{
+			RepositoryDigestMirrors: []ocpicsp.RepositoryDigestMirrors{
+				{
+					Source:  "quay.io/openstack-k8s-operators",
+					Mirrors: []string{"mirror.example.com:5000/openstack-k8s-operators/"},
+				},
+			},
+		},
+	}
+
+	h := setupTestHelper(true, idms, icsp)
+
+	scopes, sourceByMirror, err := GetMirrorRegistryScopes(ctx, h)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(scopes).To(Equal([]string{"mirror.example.com:5000/rhosp-dev-preview"}))
+	g.Expect(sourceByMirror).To(Equal(map[string]string{
+		"mirror.example.com:5000/rhosp-dev-preview": "registry.redhat.io/rhosp-dev-preview",
+	}))
+}
+
+func TestGetMirrorRegistryScopes_FallsBackToICSP(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	icsp := &ocpicsp.ImageContentSourcePolicy{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "test-icsp",
+		},
+		Spec: ocpicsp.ImageContentSourcePolicySpec{
+			RepositoryDigestMirrors: []ocpicsp.RepositoryDigestMirrors{
+				{
+					Source:  "quay.io/openstack-k8s-operators",
+					Mirrors: []string{"mirror.example.com:5000/openstack-k8s-operators/"},
+				},
+			},
+		},
+	}
+
+	h := setupTestHelper(true, icsp)
+
+	scopes, sourceByMirror, err := GetMirrorRegistryScopes(ctx, h)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(scopes).To(Equal([]string{"mirror.example.com:5000/openstack-k8s-operators"}))
+	g.Expect(sourceByMirror).To(Equal(map[string]string{
+		"mirror.example.com:5000/openstack-k8s-operators": "quay.io/openstack-k8s-operators",
+	}))
+}
+
+func TestGetMirrorRegistryScopes_MultipleIDMS(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	idms1 := &ocpidms.ImageDigestMirrorSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "idms-one",
+		},
+		Spec: ocpidms.ImageDigestMirrorSetSpec{
+			ImageDigestMirrors: []ocpidms.ImageDigestMirrors{
+				{
+					Source:  "registry.redhat.io/rhoso",
+					Mirrors: []ocpidms.ImageMirror{"mirror.example.com:5000/rhoso"},
+				},
+			},
+		},
+	}
+	idms2 := &ocpidms.ImageDigestMirrorSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "idms-two",
+		},
+		Spec: ocpidms.ImageDigestMirrorSetSpec{
+			ImageDigestMirrors: []ocpidms.ImageDigestMirrors{
+				{
+					Source:  "registry.redhat.io/rhoso-operators",
+					Mirrors: []ocpidms.ImageMirror{"mirror.example.com:5000/rhoso-operators"},
+				},
+			},
+		},
+	}
+
+	h := setupTestHelper(true, idms1, idms2)
+
+	scopes, sourceByMirror, err := GetMirrorRegistryScopes(ctx, h)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(scopes).To(Equal([]string{
+		"mirror.example.com:5000/rhoso",
+		"mirror.example.com:5000/rhoso-operators",
+	}))
+	g.Expect(sourceByMirror).To(Equal(map[string]string{
+		"mirror.example.com:5000/rhoso":           "registry.redhat.io/rhoso",
+		"mirror.example.com:5000/rhoso-operators": "registry.redhat.io/rhoso-operators",
+	}))
+}
+
+func TestGetMirrorRegistryScopes_CRDsNotInstalled(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	h := setupTestHelper(false)
+
+	scopes, sourceByMirror, err := GetMirrorRegistryScopes(ctx, h)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(scopes).To(BeNil())
+	g.Expect(sourceByMirror).To(BeNil())
 }
 
 // Test GetMCRegistryConf scenarios
@@ -543,4 +677,269 @@ func TestGetMirrorRegistryCACerts_ConfigMapNotFound(t *testing.T) {
 	caCerts, err := GetMirrorRegistryCACerts(ctx, h)
 	g.Expect(err).ToNot(HaveOccurred())
 	g.Expect(caCerts).To(BeNil())
+}
+
+func newSigstorePolicy(
+	version string,
+	name string,
+	scopes []string,
+	keyData string,
+	matchPolicy string,
+	signedPrefix string,
+) *unstructured.Unstructured {
+	rawScopes := make([]interface{}, 0, len(scopes))
+	for _, scope := range scopes {
+		rawScopes = append(rawScopes, scope)
+	}
+
+	raw := map[string]interface{}{
+		"apiVersion": fmt.Sprintf("config.openshift.io/%s", version),
+		"kind":       "ClusterImagePolicy",
+		"metadata": map[string]interface{}{
+			"name": name,
+		},
+		"spec": map[string]interface{}{
+			"scopes": rawScopes,
+			"policy": map[string]interface{}{
+				"rootOfTrust": map[string]interface{}{
+					"policyType": "PublicKey",
+					"publicKey": map[string]interface{}{
+						"keyData": base64.StdEncoding.EncodeToString([]byte(keyData)),
+					},
+				},
+				"signedIdentity": map[string]interface{}{
+					"matchPolicy": matchPolicy,
+				},
+			},
+		},
+	}
+
+	if matchPolicy == "RemapIdentity" {
+		rawPolicy := raw["spec"].(map[string]interface{})["policy"].(map[string]interface{})
+		rawPolicy["signedIdentity"].(map[string]interface{})["remapIdentity"] = map[string]interface{}{
+			"prefix":       scopes[0],
+			"signedPrefix": signedPrefix,
+		}
+	}
+
+	policy := &unstructured.Unstructured{Object: raw}
+	policy.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "config.openshift.io",
+		Version: version,
+		Kind:    "ClusterImagePolicy",
+	})
+
+	return policy
+}
+
+func newClusterImagePolicyCRD(servedVersions ...string) *apiextensionsv1.CustomResourceDefinition {
+	versions := make([]apiextensionsv1.CustomResourceDefinitionVersion, 0, len(servedVersions))
+	for i, version := range servedVersions {
+		versions = append(versions, apiextensionsv1.CustomResourceDefinitionVersion{
+			Name:    version,
+			Served:  true,
+			Storage: i == 0,
+		})
+	}
+
+	return &apiextensionsv1.CustomResourceDefinition{
+		ObjectMeta: metav1.ObjectMeta{Name: "clusterimagepolicies.config.openshift.io"},
+		Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+			Group: "config.openshift.io",
+			Names: apiextensionsv1.CustomResourceDefinitionNames{
+				Kind:   "ClusterImagePolicy",
+				Plural: "clusterimagepolicies",
+			},
+			Scope:    apiextensionsv1.ClusterScoped,
+			Versions: versions,
+		},
+	}
+}
+
+func TestGetSigstoreImagePolicy_WithRemapIdentity(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	policy := newSigstorePolicy(
+		"v1",
+		"test-policy",
+		[]string{"local-registry.example.com:5000"},
+		"test-public-key",
+		"RemapIdentity",
+		"registry.example.com/vendor",
+	)
+
+	h := setupTestHelper(true, newClusterImagePolicyCRD("v1"), policy)
+
+	sourceByMirror := map[string]string{
+		"local-registry.example.com:5000": "registry.example.com/vendor",
+	}
+	result, err := GetSigstoreImagePolicy(ctx, h, []string{"local-registry.example.com:5000"}, sourceByMirror)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(result).ToNot(BeNil())
+	g.Expect(result.RegistryMappings).To(Equal([]RegistryMapping{
+		{Mirror: "local-registry.example.com:5000", Source: "registry.example.com/vendor"},
+	}))
+	g.Expect(result.CosignKeyData).To(Equal(base64.StdEncoding.EncodeToString([]byte("test-public-key"))))
+	g.Expect(result.SignedPrefix).To(Equal("registry.example.com/vendor"))
+}
+
+func TestGetSigstoreImagePolicy(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	policy := newSigstorePolicy(
+		"v1alpha1",
+		"test-policy",
+		[]string{"local-registry.example.com:5000"},
+		"test-public-key",
+		"MatchRepoDigestOrExact",
+		"",
+	)
+
+	h := setupTestHelper(true, newClusterImagePolicyCRD("v1alpha1"), policy)
+
+	result, err := GetSigstoreImagePolicy(ctx, h, []string{"local-registry.example.com:5000"}, nil)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(result).ToNot(BeNil())
+	g.Expect(result.RegistryMappings).To(Equal([]RegistryMapping{
+		{Mirror: "local-registry.example.com:5000"},
+	}))
+	g.Expect(result.CosignKeyData).To(Equal(base64.StdEncoding.EncodeToString([]byte("test-public-key"))))
+	g.Expect(result.SignedPrefix).To(BeEmpty())
+}
+
+func TestGetSigstoreImagePolicy_ReturnsAllMatchingMirrorScopes(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	policy := newSigstorePolicy(
+		"v1alpha1",
+		"test-policy",
+		[]string{"mirror.example.com:5000"},
+		"test-public-key",
+		"MatchRepoDigestOrExact",
+		"",
+	)
+
+	h := setupTestHelper(true, newClusterImagePolicyCRD("v1alpha1"), policy)
+
+	sourceByMirror := map[string]string{
+		"mirror.example.com:5000/rhoso":           "registry.redhat.io/rhoso",
+		"mirror.example.com:5000/rhoso-operators": "registry.redhat.io/rhoso-operators",
+	}
+	result, err := GetSigstoreImagePolicy(ctx, h, []string{
+		"mirror.example.com:5000/rhoso",
+		"mirror.example.com:5000/rhoso-operators",
+	}, sourceByMirror)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(result).ToNot(BeNil())
+	g.Expect(result.RegistryMappings).To(Equal([]RegistryMapping{
+		{Mirror: "mirror.example.com:5000/rhoso", Source: "registry.redhat.io/rhoso"},
+		{Mirror: "mirror.example.com:5000/rhoso-operators", Source: "registry.redhat.io/rhoso-operators"},
+	}))
+	g.Expect(result.CosignKeyData).To(Equal(base64.StdEncoding.EncodeToString([]byte("test-public-key"))))
+}
+
+func TestGetSigstoreImagePolicy_IgnoresNonMatchingPolicies(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	policy := newSigstorePolicy(
+		"v1alpha1",
+		"other-policy",
+		[]string{"other-registry.example.com:5000"},
+		"test-public-key",
+		"MatchRepoDigestOrExact",
+		"",
+	)
+
+	h := setupTestHelper(true, newClusterImagePolicyCRD("v1alpha1"), policy)
+
+	result, err := GetSigstoreImagePolicy(ctx, h, []string{"mirror.example.com:5000/openstack-k8s-operators"}, nil)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(result).To(BeNil())
+}
+
+func TestGetSigstoreImagePolicy_ReturnsErrorForAmbiguousPolicies(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	policy1 := newSigstorePolicy(
+		"v1alpha1",
+		"policy-one",
+		[]string{"mirror.example.com:5000/openstack-k8s-operators"},
+		"key-one",
+		"MatchRepoDigestOrExact",
+		"",
+	)
+	policy2 := newSigstorePolicy(
+		"v1alpha1",
+		"policy-two",
+		[]string{"mirror.example.com:5000/openstack-k8s-operators"},
+		"key-two",
+		"MatchRepoDigestOrExact",
+		"",
+	)
+
+	h := setupTestHelper(true, newClusterImagePolicyCRD("v1alpha1"), policy1, policy2)
+
+	result, err := GetSigstoreImagePolicy(ctx, h, []string{"mirror.example.com:5000/openstack-k8s-operators"}, nil)
+	g.Expect(err).To(HaveOccurred())
+	g.Expect(err.Error()).To(ContainSubstring("expected exactly one ClusterImagePolicy matching mirror registries"))
+	g.Expect(result).To(BeNil())
+}
+
+func TestGetSigstoreImagePolicy_CRDNotInstalled(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	h := setupTestHelper(false)
+
+	result, err := GetSigstoreImagePolicy(ctx, h, []string{"mirror.example.com:5000/openstack-k8s-operators"}, nil)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(result).To(BeNil())
+}
+
+func TestGetSigstoreImagePolicy_WildcardScopeMatch(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	policy := newSigstorePolicy(
+		"v1",
+		"wildcard-policy",
+		[]string{"*.example.com"},
+		"test-public-key",
+		"MatchRepoDigestOrExact",
+		"",
+	)
+
+	h := setupTestHelper(true, newClusterImagePolicyCRD("v1"), policy)
+
+	result, err := GetSigstoreImagePolicy(ctx, h, []string{"mirror.example.com:5000/rhoso"}, nil)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(result).ToNot(BeNil())
+	g.Expect(result.RegistryMappings).To(Equal([]RegistryMapping{
+		{Mirror: "mirror.example.com:5000/rhoso"},
+	}))
+}
+
+func TestGetSigstoreImagePolicy_SkipsOpenshiftPolicy(t *testing.T) {
+	g := NewWithT(t)
+	ctx := context.Background()
+
+	openshiftPolicy := newSigstorePolicy(
+		"v1",
+		"openshift",
+		[]string{"mirror.example.com:5000"},
+		"openshift-key",
+		"MatchRepoDigestOrExact",
+		"",
+	)
+
+	h := setupTestHelper(true, newClusterImagePolicyCRD("v1"), openshiftPolicy)
+
+	result, err := GetSigstoreImagePolicy(ctx, h, []string{"mirror.example.com:5000/rhoso"}, nil)
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Expect(result).To(BeNil())
 }
