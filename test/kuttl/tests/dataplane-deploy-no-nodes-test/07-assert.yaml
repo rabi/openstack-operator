@@ -62,7 +62,7 @@ spec:
                 - configure-os
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: configure-os-edpm-compute-node-selection-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log

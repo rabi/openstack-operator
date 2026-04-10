@@ -68,7 +68,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: configure-os-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log

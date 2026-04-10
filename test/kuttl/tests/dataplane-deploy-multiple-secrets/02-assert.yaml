@@ -167,7 +167,7 @@ spec:
             edpm_service_type: install-certs-ovr
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: install-certs-ovr-openstack-edpm-tls-openstack-edpm-tls
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -292,7 +292,7 @@ spec:
             edpm_service_type: generic-service1
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: generic-service1-openstack-edpm-tls-openstack-edpm-tls
         resources: {}
         terminationMessagePath: /dev/termination-log

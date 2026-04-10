@@ -129,7 +129,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: bootstrap-edpm-multinodeset-edpm-compute-beta-nodeset
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -236,7 +236,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: download-cache-edpm-multinodeset-edpm-compute-beta-nodeset
         resources: {}
         terminationMessagePath: /dev/termination-log

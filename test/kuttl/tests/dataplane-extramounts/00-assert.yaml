@@ -85,7 +85,7 @@ spec:
             edpm_service_type: test-service
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: test-service-edpm-extramounts-edpm-extramounts
         resources: {}
         terminationMessagePath: /dev/termination-log

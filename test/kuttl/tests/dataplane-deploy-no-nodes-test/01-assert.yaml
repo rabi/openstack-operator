@@ -126,7 +126,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: download-cache-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -225,7 +225,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: bootstrap-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -331,7 +331,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: configure-network-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -431,7 +431,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: validate-network-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -531,7 +531,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: configure-os-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -631,7 +631,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: install-certs-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -773,7 +773,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: ovn-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -883,7 +883,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: neutron-metadata-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -1023,7 +1023,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: neutron-ovn-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -1163,7 +1163,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: neutron-sriov-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -1273,7 +1273,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: neutron-dhcp-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -1383,7 +1383,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: libvirt-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -1493,7 +1493,7 @@ spec:
             foo: bar
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: nova-edpm-compute-no-nodes-edpm-compute-no-nodes
         resources: {}
         terminationMessagePath: /dev/termination-log

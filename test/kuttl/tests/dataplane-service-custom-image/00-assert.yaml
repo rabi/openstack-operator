@@ -113,7 +113,7 @@ spec:
 
 
         image: example.com/repo/runner-image:latest
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: custom-img-svc-edpm-compute-no-nodes-edpm-no-nodes-custom-svc
         resources: {}
         terminationMessagePath: /dev/termination-log

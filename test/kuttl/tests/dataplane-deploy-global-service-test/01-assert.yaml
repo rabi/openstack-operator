@@ -135,7 +135,7 @@ spec:
             edpm_service_type: custom-global-service
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: custom-global-service-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -237,7 +237,7 @@ spec:
             edpm_service_type: download-cache
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: download-cache-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -335,7 +335,7 @@ spec:
             edpm_service_type: bootstrap
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: bootstrap-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -439,7 +439,7 @@ spec:
             edpm_service_type: configure-network
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: configure-network-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -537,7 +537,7 @@ spec:
             edpm_service_type: validate-network
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: validate-network-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -635,7 +635,7 @@ spec:
             edpm_service_type: configure-os
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: configure-os-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -733,7 +733,7 @@ spec:
             edpm_service_type: install-certs
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: install-certs-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -880,7 +880,7 @@ spec:
             edpm_service_type: ovn
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: ovn-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -989,7 +989,7 @@ spec:
             edpm_service_type: neutron-metadata
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: neutron-metadata-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -1128,7 +1128,7 @@ spec:
             edpm_service_type: neutron-ovn
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: neutron-ovn-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -1267,7 +1267,7 @@ spec:
             edpm_service_type: neutron-sriov
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: neutron-sriov-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -1376,7 +1376,7 @@ spec:
             edpm_service_type: neutron-dhcp
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: neutron-dhcp-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -1485,7 +1485,7 @@ spec:
             edpm_service_type: libvirt
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: libvirt-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -1594,7 +1594,7 @@ spec:
             edpm_service_type: nova
 
 
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: nova-edpm-compute-global-edpm-compute-global
         resources: {}
         terminationMessagePath: /dev/termination-log
