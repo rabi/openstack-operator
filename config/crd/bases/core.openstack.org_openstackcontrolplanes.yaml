@@ -14998,7 +14998,7 @@ spec:
                             default: true
                             type: boolean
                           minPartHours:
-                            default: 1
+                            default: 24
                             format: int64
                             minimum: 1
                             type: integer
