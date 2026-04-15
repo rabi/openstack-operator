@@ -9,11 +9,11 @@ require (
 	github.com/onsi/gomega v1.39.1
 	github.com/openstack-k8s-operators/barbican-operator/api v0.6.1-0.20260414142449-4ba81106621b
 	github.com/openstack-k8s-operators/cinder-operator/api v0.6.1-0.20260413123643-7d895a78aba4
-	github.com/openstack-k8s-operators/designate-operator/api v0.6.1-0.20260414164250-6b2ee336d4b4
+	github.com/openstack-k8s-operators/designate-operator/api v0.6.1-0.20260415102207-122faf794198
 	github.com/openstack-k8s-operators/glance-operator/api v0.6.1-0.20260413083149-5d3b9a38d41f
 	github.com/openstack-k8s-operators/heat-operator/api v0.6.1-0.20260413092447-bc6ef34fe170
 	github.com/openstack-k8s-operators/horizon-operator/api v0.6.1-0.20260413092200-e2ac36066192
-	github.com/openstack-k8s-operators/infra-operator/apis v0.6.1-0.20260413093016-aa7e41f634bb
+	github.com/openstack-k8s-operators/infra-operator/apis v0.6.1-0.20260415111437-a986f7fb1533
 	github.com/openstack-k8s-operators/ironic-operator/api v0.6.1-0.20260413111541-b8fc3a4b0521
 	github.com/openstack-k8s-operators/keystone-operator/api v0.6.1-0.20260414133946-c146da0da0d6
 	github.com/openstack-k8s-operators/lib-common/modules/common v0.6.1-0.20260410120633-3e1007da0cbd
