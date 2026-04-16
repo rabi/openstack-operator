@@ -166,6 +166,9 @@ const (
 	// Infrastructure includes: CAs, DNSMasq, RabbitMQ, Galera (MariaDB), Memcached, and OVN databases
 	// This condition is set to True when deployment-stage annotation is "infrastructure-only" and all infrastructure is ready
 	OpenStackControlPlaneInfrastructureReadyCondition condition.Type = "OpenStackControlPlaneInfrastructureReady"
+
+	// OpenStackControlPlaneBackupConfigReadyCondition Status=True condition which indicates if OpenStackBackupConfig is reconciled
+	OpenStackControlPlaneBackupConfigReadyCondition condition.Type = "OpenStackControlPlaneBackupConfigReady"
 )
 
 // Common Messages used by API objects.
@@ -500,6 +503,15 @@ const (
 
 	// OpenStackControlPlaneOpenStackVersionInitializationReadyErrorMessage
 	OpenStackControlPlaneOpenStackVersionInitializationReadyErrorMessage = "OpenStackControlPlane OpenStackVersion initialization error occured %s"
+
+	// OpenStackControlPlaneBackupConfigReadyInitMessage
+	OpenStackControlPlaneBackupConfigReadyInitMessage = "OpenStackControlPlane BackupConfig not started"
+
+	// OpenStackControlPlaneBackupConfigReadyMessage
+	OpenStackControlPlaneBackupConfigReadyMessage = "OpenStackControlPlane BackupConfig ready"
+
+	// OpenStackControlPlaneBackupConfigReadyErrorMessage
+	OpenStackControlPlaneBackupConfigReadyErrorMessage = "OpenStackControlPlane BackupConfig error occured %s"
 
 	// OpenStackControlPlaneWatcherReadyInitMessage
 	OpenStackControlPlaneWatcherReadyInitMessage = "OpenStackControlPlane Watcher not started"

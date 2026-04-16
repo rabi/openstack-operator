@@ -223,7 +223,7 @@ func reconcileRabbitMQ(
 				certmgrv1.UsageClientAuth,
 				certmgrv1.UsageContentCommitment,
 			},
-			Labels: map[string]string{serviceCertSelector: ""},
+			Labels: map[string]string{ServiceCertSelector: ""},
 		}
 		if instance.Spec.TLS.PodLevel.Internal.Cert.Duration != nil {
 			certRequest.Duration = &instance.Spec.TLS.PodLevel.Internal.Cert.Duration.Duration

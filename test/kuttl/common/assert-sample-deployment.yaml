@@ -202,6 +202,10 @@ status:
     reason: Ready
     status: "True"
     type: Ready
+  - message: OpenStackControlPlane BackupConfig ready
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneBackupConfigReady
   - message: OpenStackControlPlane Barbican completed
     reason: Ready
     status: "True"

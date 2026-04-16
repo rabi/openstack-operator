@@ -758,6 +758,23 @@ var _ = Describe("OpenStackOperator controller", func() {
 			//Expect(OSCtlplane.Spec.Placement.APIOverride.Route.Annotations).Should(HaveKeyWithValue("api.placement.openstack.org/timeout", "60s"))
 		})
 
+		It("should create OpenStackBackupConfig and set condition to True", func() {
+			Eventually(func(g Gomega) {
+				OSCtlplane := GetOpenStackControlPlane(names.OpenStackControlplaneName)
+				g.Expect(OSCtlplane.Status.Conditions.Get(
+					corev1.OpenStackControlPlaneBackupConfigReadyCondition)).ToNot(BeNil())
+				g.Expect(OSCtlplane.Status.Conditions.Get(
+					corev1.OpenStackControlPlaneBackupConfigReadyCondition).Status).To(
+					Equal(k8s_corev1.ConditionTrue))
+			}, timeout, interval).Should(Succeed())
+
+			// Verify BackupConfig CR was created
+			Eventually(func(g Gomega) {
+				backupConfigList := GetOpenStackBackupConfigList(names.OpenStackControlplaneName.Namespace)
+				g.Expect(backupConfigList.Items).ToNot(BeEmpty())
+			}, timeout, interval).Should(Succeed())
+		})
+
 		It("should create selfsigned issuer and public+internal CA and issuer", func() {
 			OSCtlplane := GetOpenStackControlPlane(names.OpenStackControlplaneName)
 

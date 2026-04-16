@@ -17,6 +17,10 @@ status:
     status: "False"
     type: Ready
   # Following conditions are alphabetically sorted by type
+  - message: OpenStackControlPlane BackupConfig ready
+    reason: Ready
+    status: "True"
+    type: OpenStackControlPlaneBackupConfigReady
   - reason: Init
     status: Unknown
     type: OpenStackControlPlaneBarbicanReady

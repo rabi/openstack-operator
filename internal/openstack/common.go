@@ -64,8 +64,8 @@ const (
 	// overrides
 	ooAppSelector = "osctlplane-service"
 
-	// serviceCertSelector selector passed to cert-manager to set on the service cert secret
-	serviceCertSelector = "service-cert"
+	// ServiceCertSelector selector passed to cert-manager to set on the service cert secret
+	ServiceCertSelector = "service-cert"
 
 	// caCertSelector selector passed to cert-manager to set on the ca cert secret
 	caCertSelector = "ca-cert"
@@ -331,7 +331,7 @@ func EnsureEndpointConfig(
 						},
 						Ips:         nil,
 						Annotations: ed.Annotations,
-						Labels:      util.MergeMaps(ed.Labels, map[string]string{serviceCertSelector: ""}),
+						Labels:      util.MergeMaps(ed.Labels, map[string]string{ServiceCertSelector: ""}),
 						Usages:      nil,
 					}
 
@@ -381,7 +381,7 @@ func EnsureEndpointConfig(
 					},
 					Ips:         nil,
 					Annotations: ed.Annotations,
-					Labels:      util.MergeMaps(ed.Labels, map[string]string{serviceCertSelector: ""}),
+					Labels:      util.MergeMaps(ed.Labels, map[string]string{ServiceCertSelector: ""}),
 					Usages:      nil,
 				}
 
@@ -638,7 +638,7 @@ func (ed *EndpointDetail) CreateRoute(
 				Hostnames:   []string{*ed.Hostname},
 				Ips:         nil,
 				Annotations: ed.Annotations,
-				Labels:      util.MergeMaps(ed.Labels, map[string]string{serviceCertSelector: ""}),
+				Labels:      util.MergeMaps(ed.Labels, map[string]string{ServiceCertSelector: ""}),
 				Usages:      nil,
 			}
 			if instance.Spec.TLS.Ingress.Cert.Duration != nil {
@@ -945,7 +945,7 @@ func DeleteCertsAndRoutes(
 
 		// Delete certs by service and route-name
 		for _, cert := range certs.Items {
-			if _, ok := cert.Labels[serviceCertSelector]; ok && strings.Contains(cert.Name, route.Name) {
+			if _, ok := cert.Labels[ServiceCertSelector]; ok && strings.Contains(cert.Name, route.Name) {
 				if object.CheckOwnerRefExist(instance.GetUID(), cert.OwnerReferences) {
 					log.Info("Deleting certificate", ":", cert.Name)
 					err := DeleteCertificate(ctx, helper, instance.Namespace, cert.Name)

@@ -180,7 +180,7 @@ func ReconcileOVNDbClusters(ctx context.Context, instance *corev1beta1.OpenStack
 					certmgrv1.UsageServerAuth,
 					certmgrv1.UsageClientAuth,
 				},
-				Labels: map[string]string{serviceCertSelector: ""},
+				Labels: map[string]string{ServiceCertSelector: ""},
 			}
 			if instance.Spec.TLS.PodLevel.Ovn.Cert.Duration != nil {
 				certRequest.Duration = &instance.Spec.TLS.PodLevel.Ovn.Cert.Duration.Duration
@@ -320,7 +320,7 @@ func ReconcileOVNNorthd(ctx context.Context, instance *corev1beta1.OpenStackCont
 				certmgrv1.UsageServerAuth,
 				certmgrv1.UsageClientAuth,
 			},
-			Labels: map[string]string{serviceCertSelector: ""},
+			Labels: map[string]string{ServiceCertSelector: ""},
 		}
 		if instance.Spec.TLS.PodLevel.Ovn.Cert.Duration != nil {
 			certRequest.Duration = &instance.Spec.TLS.PodLevel.Ovn.Cert.Duration.Duration
@@ -464,7 +464,7 @@ func ReconcileOVNController(ctx context.Context, instance *corev1beta1.OpenStack
 				certmgrv1.UsageServerAuth,
 				certmgrv1.UsageClientAuth,
 			},
-			Labels: map[string]string{serviceCertSelector: ""},
+			Labels: map[string]string{ServiceCertSelector: ""},
 		}
 		if instance.Spec.TLS.PodLevel.Ovn.Cert.Duration != nil {
 			certRequest.Duration = &instance.Spec.TLS.PodLevel.Ovn.Cert.Duration.Duration
@@ -607,7 +607,7 @@ func EnsureOVNMetricsCert(ctx context.Context, instance *corev1beta1.OpenStackCo
 			certmgrv1.UsageServerAuth,
 			certmgrv1.UsageClientAuth,
 		},
-		Labels: map[string]string{serviceCertSelector: ""},
+		Labels: map[string]string{ServiceCertSelector: ""},
 	}
 
 	// Apply certificate duration settings if configured
