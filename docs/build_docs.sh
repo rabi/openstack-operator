@@ -15,10 +15,10 @@ DATAPLANE_PATHS=(
     "api/dataplane/v1beta1/common.go"
 )
 
-# Getting APIs from Services
-SERVICE_PATH=($(MODCACHE=$(go env GOMODCACHE) awk '/openstack-k8s-operators/ && ! /lib-common/ && ! /openstack-operator/ && ! /infra/ && ! /replace/ {print ENVIRON["MODCACHE"] "/" $1 "@" $2 "/v1beta1/*_types.go"}' api/go.mod))
+# Getting APIs from Services (use find to support multi-group operators like nova-operator)
+SERVICE_PATH=($(MODCACHE=$(go env GOMODCACHE) awk '/openstack-k8s-operators/ && ! /lib-common/ && ! /openstack-operator/ && ! /infra/ && ! /replace/ {print ENVIRON["MODCACHE"] "/" $1 "@" $2}' api/go.mod))
 for SERVICE in ${SERVICE_PATH[@]};do
-    CTLPLANE_PATHS+=($(ls ${SERVICE}))
+    CTLPLANE_PATHS+=($(find ${SERVICE} -path "*/v1beta1/*_types.go"))
 done
 
 # Getting APIs from Infra
