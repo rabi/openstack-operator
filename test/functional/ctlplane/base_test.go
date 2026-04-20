@@ -40,6 +40,7 @@ import (
 	neutronv1 "github.com/openstack-k8s-operators/neutron-operator/api/v1beta1"
 	novav1 "github.com/openstack-k8s-operators/nova-operator/api/nova/v1beta1"
 	octaviav1 "github.com/openstack-k8s-operators/octavia-operator/api/v1beta1"
+	backupv1 "github.com/openstack-k8s-operators/openstack-operator/api/backup/v1beta1"
 	openstackclientv1 "github.com/openstack-k8s-operators/openstack-operator/api/client/v1beta1"
 	corev1 "github.com/openstack-k8s-operators/openstack-operator/api/core/v1beta1"
 	dataplanev1 "github.com/openstack-k8s-operators/openstack-operator/api/dataplane/v1beta1"
@@ -700,6 +701,14 @@ func GetOpenStackControlPlane(name types.NamespacedName) *corev1.OpenStackContro
 	instance := &corev1.OpenStackControlPlane{}
 	Eventually(func(g Gomega) {
 		g.Expect(k8sClient.Get(ctx, name, instance)).Should(Succeed())
+	}, timeout, interval).Should(Succeed())
+	return instance
+}
+
+func GetOpenStackBackupConfigList(namespace string) *backupv1.OpenStackBackupConfigList {
+	instance := &backupv1.OpenStackBackupConfigList{}
+	Eventually(func(g Gomega) {
+		g.Expect(k8sClient.List(ctx, instance, client.InNamespace(namespace))).Should(Succeed())
 	}, timeout, interval).Should(Succeed())
 	return instance
 }

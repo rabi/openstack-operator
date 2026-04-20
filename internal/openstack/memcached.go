@@ -213,7 +213,7 @@ func reconcileMemcached(
 				fmt.Sprintf("%s.%s.svc.%s", name, instance.Namespace, clusterDomain),
 				fmt.Sprintf("*.%s.%s.svc.%s", name, instance.Namespace, clusterDomain),
 			},
-			Labels: map[string]string{serviceCertSelector: ""},
+			Labels: map[string]string{ServiceCertSelector: ""},
 		}
 		if instance.Spec.TLS.PodLevel.Internal.Cert.Duration != nil {
 			certRequest.Duration = &instance.Spec.TLS.PodLevel.Internal.Cert.Duration.Duration
@@ -245,12 +245,12 @@ func reconcileMemcached(
 					fmt.Sprintf("*.%s.svc", instance.Namespace),
 					fmt.Sprintf("*.%s.svc.%s", instance.Namespace, clusterDomain),
 				},
-				Labels: map[string]string{serviceCertSelector: ""},
 				Usages: []certmgrv1.KeyUsage{
 					certmgrv1.UsageKeyEncipherment,
 					certmgrv1.UsageDigitalSignature,
 					certmgrv1.UsageClientAuth,
 				},
+				Labels: map[string]string{ServiceCertSelector: ""},
 			}
 			if instance.Spec.TLS.PodLevel.Internal.Cert.Duration != nil {
 				certRequest.Duration = &instance.Spec.TLS.PodLevel.Internal.Cert.Duration.Duration

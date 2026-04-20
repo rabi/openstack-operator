@@ -33,6 +33,10 @@ const (
 	galeraReady    galeraStatus = iota
 )
 
+func galeraCertName(name string) string {
+	return fmt.Sprintf("galera-%s-svc", name)
+}
+
 func deleteUndefinedGaleras(
 	ctx context.Context,
 	instance *corev1beta1.OpenStackControlPlane,
@@ -57,7 +61,7 @@ func deleteUndefinedGaleras(
 			if object.CheckOwnerRefExist(instance.GetUID(), galeraObj.OwnerReferences) {
 				log.Info("Deleting Galera", "", galeraObj.Name)
 
-				certName := fmt.Sprintf("galera-%s-svc", galeraObj.Name)
+				certName := galeraCertName(galeraObj.Name)
 				err = DeleteCertificate(ctx, helper, instance.Namespace, certName)
 				if err != nil {
 					delErrs = append(delErrs, fmt.Errorf("galera cert deletion for '%s' failed, because: %w", certName, err))
@@ -119,7 +123,7 @@ func ReconcileGaleras(
 		// If TLS can/must be used is a per user configuration.
 		certRequest := certmanager.CertificateRequest{
 			IssuerName: instance.GetInternalIssuer(),
-			CertName:   fmt.Sprintf("galera-%s-svc", name),
+			CertName:   galeraCertName(name),
 			Hostnames: []string{
 				hostname,
 				fmt.Sprintf("%s.%s", hostname, clusterDomain),
@@ -142,7 +146,7 @@ func ReconcileGaleras(
 				"server auth",
 				"client auth",
 			},
-			Labels: map[string]string{serviceCertSelector: ""},
+			Labels: map[string]string{ServiceCertSelector: ""},
 		}
 		if instance.Spec.TLS.PodLevel.Internal.Cert.Duration != nil {
 			certRequest.Duration = &instance.Spec.TLS.PodLevel.Internal.Cert.Duration.Duration

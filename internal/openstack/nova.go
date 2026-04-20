@@ -378,7 +378,7 @@ func ReconcileNova(ctx context.Context, instance *corev1beta1.OpenStackControlPl
 							certmgrv1.UsageServerAuth,
 							certmgrv1.UsageClientAuth,
 						},
-						Labels: map[string]string{serviceCertSelector: ""},
+						Labels: map[string]string{ServiceCertSelector: ""},
 					}
 					if instance.Spec.TLS.PodLevel.Libvirt.Cert.Duration != nil {
 						certRequest.Duration = &instance.Spec.TLS.PodLevel.Libvirt.Cert.Duration.Duration

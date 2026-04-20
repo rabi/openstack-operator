@@ -132,7 +132,7 @@ func ReconcileOctavia(ctx context.Context, instance *corev1beta1.OpenStackContro
 				certmgrv1.UsageDigitalSignature,
 				certmgrv1.UsageClientAuth,
 			},
-			Labels: map[string]string{serviceCertSelector: ""},
+			Labels: map[string]string{ServiceCertSelector: ""},
 		}
 		if instance.Spec.TLS.PodLevel.Ovn.Cert.Duration != nil {
 			certRequest.Duration = &instance.Spec.TLS.PodLevel.Ovn.Cert.Duration.Duration
