@@ -126,7 +126,11 @@ EOF_CAT
 
 }
 
-for BUNDLE in $(hack/pin-bundle-images.sh | tr "," " "); do
+if ! BUNDLES="$(hack/pin-bundle-images.sh)"; then
+    exit 1
+fi
+
+for BUNDLE in $(echo "$BUNDLES" | tr "," " "); do
     (
         set +e
         n=0
