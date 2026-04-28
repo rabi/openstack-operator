@@ -50,6 +50,7 @@ import (
 	backupv1beta1 "github.com/openstack-k8s-operators/openstack-operator/api/backup/v1beta1"
 	backupcontroller "github.com/openstack-k8s-operators/openstack-operator/internal/controller/backup"
 
+	webhookbackupv1beta1 "github.com/openstack-k8s-operators/openstack-operator/internal/webhook/backup/v1beta1"
 	// +kubebuilder:scaffold:imports
 	certmgrv1 "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
 	k8s_networkv1 "github.com/k8snetworkplumbingwg/network-attachment-definition-client/pkg/apis/k8s.cni.cncf.io/v1"
@@ -423,6 +424,11 @@ func main() {
 		// nolint:goconst
 		if err := webhookdataplanev1beta1.SetupOpenStackDataPlaneServiceWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create webhook", "webhook", "OpenStackDataPlaneService")
+			os.Exit(1)
+		}
+		// nolint:goconst
+		if err := webhookbackupv1beta1.SetupOpenStackBackupConfigWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "OpenStackBackupConfig")
 			os.Exit(1)
 		}
 		checker = mgr.GetWebhookServer().StartedChecker()

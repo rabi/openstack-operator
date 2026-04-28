@@ -388,6 +388,26 @@ webhooks:
     service:
       name: openstack-operator-webhook-service
       namespace: '{{ .OperatorNamespace }}'
+      path: /validate-backup-openstack-org-v1beta1-openstackbackupconfig
+  failurePolicy: Fail
+  name: vopenstackbackupconfig-v1beta1.kb.io
+  rules:
+  - apiGroups:
+    - backup.openstack.org
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - openstackbackupconfigs
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: openstack-operator-webhook-service
+      namespace: '{{ .OperatorNamespace }}'
       path: /validate-client-openstack-org-v1beta1-openstackclient
   failurePolicy: Fail
   name: vopenstackclient-v1beta1.kb.io

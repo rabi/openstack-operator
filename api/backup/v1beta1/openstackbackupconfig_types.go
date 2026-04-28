@@ -17,8 +17,11 @@ limitations under the License.
 package v1beta1
 
 import (
+	"context"
+
 	condition "github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // BackupLabelingPolicy controls whether backup labeling is active for a resource type
@@ -142,6 +145,18 @@ type OpenStackBackupConfigList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []OpenStackBackupConfig `json:"items"`
+}
+
+// GetOpenStackBackupConfigs returns the OpenStackBackupConfig resources in the given namespace.
+func GetOpenStackBackupConfigs(ctx context.Context, namespace string, c client.Client) (*OpenStackBackupConfigList, error) {
+	configList := &OpenStackBackupConfigList{}
+	listOpts := []client.ListOption{
+		client.InNamespace(namespace),
+	}
+	if err := c.List(ctx, configList, listOpts...); err != nil {
+		return nil, err
+	}
+	return configList, nil
 }
 
 func init() {

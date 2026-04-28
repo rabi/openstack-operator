@@ -76,6 +76,7 @@ import (
 	mariadb_test "github.com/openstack-k8s-operators/mariadb-operator/api/test/helpers"
 	ovn_test "github.com/openstack-k8s-operators/ovn-operator/api/test/helpers"
 
+	backupwebhook "github.com/openstack-k8s-operators/openstack-operator/internal/webhook/backup/v1beta1"
 	clientwebhook "github.com/openstack-k8s-operators/openstack-operator/internal/webhook/client/v1beta1"
 	corewebhook "github.com/openstack-k8s-operators/openstack-operator/internal/webhook/core/v1beta1"
 	dataplanewebhook "github.com/openstack-k8s-operators/openstack-operator/internal/webhook/dataplane/v1beta1"
@@ -377,6 +378,8 @@ var _ = BeforeSuite(func() {
 	err = corewebhook.SetupOpenStackControlPlaneWebhookWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 	err = dataplanewebhook.SetupOpenStackDataPlaneNodeSetWebhookWithManager(k8sManager)
+	Expect(err).NotTo(HaveOccurred())
+	err = backupwebhook.SetupOpenStackBackupConfigWebhookWithManager(k8sManager)
 	Expect(err).NotTo(HaveOccurred())
 
 	core_ctrl.SetupVersionDefaults()
