@@ -84,7 +84,6 @@ import (
 	telemetryv1 "github.com/openstack-k8s-operators/telemetry-operator/api/v1beta1"
 	_ "github.com/openstack-k8s-operators/test-operator/api/v1beta1"
 	watcherv1 "github.com/openstack-k8s-operators/watcher-operator/api/v1beta1"
-	rabbitmqclusterv2 "github.com/rabbitmq/cluster-operator/v2/api/v1beta1"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
@@ -107,7 +106,6 @@ func init() {
 	utilruntime.Must(keystonev1.AddToScheme(scheme))
 	utilruntime.Must(mariadbv1.AddToScheme(scheme))
 	utilruntime.Must(memcachedv1.AddToScheme(scheme))
-	utilruntime.Must(rabbitmqclusterv2.AddToScheme(scheme))
 	utilruntime.Must(placementv1.AddToScheme(scheme))
 	utilruntime.Must(glancev1.AddToScheme(scheme))
 	utilruntime.Must(cinderv1.AddToScheme(scheme))

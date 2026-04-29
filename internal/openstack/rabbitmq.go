@@ -31,8 +31,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 
-	rabbitmqv2 "github.com/rabbitmq/cluster-operator/v2/api/v1beta1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 type mqStatus int
@@ -316,7 +317,12 @@ func removeRabbitmqClusterControllerReference(
 	instance *corev1beta1.OpenStackControlPlane,
 	name string,
 ) error {
-	rabbitmqCluster := &rabbitmqv2.RabbitmqCluster{}
+	rabbitmqCluster := &unstructured.Unstructured{}
+	rabbitmqCluster.SetGroupVersionKind(schema.GroupVersionKind{
+		Group:   "rabbitmq.com",
+		Version: "v1beta1",
+		Kind:    "RabbitmqCluster",
+	})
 	namespacedName := types.NamespacedName{
 		Name:      name,
 		Namespace: instance.Namespace,
