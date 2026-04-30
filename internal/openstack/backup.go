@@ -35,14 +35,25 @@ import (
 // Automatically creates an OpenStackBackupConfig CR when OpenStackControlPlane is created
 // Similar pattern to ReconcileVersion
 func ReconcileBackupConfig(ctx context.Context, instance *corev1beta1.OpenStackControlPlane, helper *helper.Helper) (ctrl.Result, *backupv1beta1.OpenStackBackupConfig, error) {
+	Log := GetLogger(ctx)
+
+	// Check if a BackupConfig already exists (may have been pre-created by the user)
+	configList, err := backupv1beta1.GetOpenStackBackupConfigs(ctx, instance.Namespace, helper.GetClient())
+	if err != nil {
+		return ctrl.Result{}, nil, fmt.Errorf("failed to list OpenStackBackupConfigs: %w", err)
+	}
+	if len(configList.Items) > 0 {
+		existing := &configList.Items[0]
+		Log.Info("Using existing OpenStackBackupConfig", "name", existing.Name)
+		return ctrl.Result{}, existing, nil
+	}
+
 	backupConfig := &backupv1beta1.OpenStackBackupConfig{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      instance.Name,
 			Namespace: instance.Namespace,
 		},
 	}
-
-	Log := GetLogger(ctx)
 
 	defaultLabeling := backupv1beta1.BackupLabelingEnabled
 

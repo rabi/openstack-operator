@@ -21,6 +21,7 @@ import (
 	. "github.com/onsi/gomega"    //revive:disable:dot-imports
 
 	k8s_corev1 "k8s.io/api/core/v1"
+	k8s_errors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -877,6 +878,44 @@ var _ = Describe("OpenStackBackupConfig controller", func() {
 				}, cm)).Should(Succeed())
 				g.Expect(cm.GetLabels()[commonbackup.BackupRestoreLabel]).To(Equal("true"))
 			}, timeout, interval).Should(Succeed())
+		})
+	})
+
+	When("A second OpenStackBackupConfig is created in the same namespace", func() {
+		BeforeEach(func() {
+			backupConfigName = types.NamespacedName{
+				Name:      "first-backup-config",
+				Namespace: namespace,
+			}
+
+			backupConfig := CreateBackupConfig(backupConfigName)
+			DeferCleanup(th.DeleteInstance, backupConfig)
+		})
+
+		It("Should be rejected by the webhook", func() {
+			secondConfig := &backupv1.OpenStackBackupConfig{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "second-backup-config",
+					Namespace: namespace,
+				},
+				Spec: backupv1.OpenStackBackupConfigSpec{
+					DefaultRestoreOrder: "10",
+					Secrets: backupv1.ResourceBackupConfig{
+						Labeling: backupLabelingPtr(backupv1.BackupLabelingEnabled),
+					},
+					ConfigMaps: backupv1.ResourceBackupConfig{
+						Labeling:     backupLabelingPtr(backupv1.BackupLabelingEnabled),
+						ExcludeNames: []string{"kube-root-ca.crt", "openshift-service-ca.crt"},
+					},
+					NetworkAttachmentDefinitions: backupv1.ResourceBackupConfig{
+						Labeling: backupLabelingPtr(backupv1.BackupLabelingEnabled),
+					},
+				},
+			}
+			err := k8sClient.Create(ctx, secondConfig)
+			Expect(err).To(HaveOccurred())
+			Expect(k8s_errors.IsForbidden(err)).To(BeTrue())
+			Expect(err.Error()).To(ContainSubstring("Only one OpenStackBackupConfig instance is supported per namespace"))
 		})
 	})
 })
