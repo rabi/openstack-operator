@@ -592,11 +592,17 @@ func checkDeployment(ctx context.Context, helper *helper.Helper,
 			for k, v := range deployment.Status.ConfigMapHashes {
 				instance.Status.ConfigMapHashes[k] = v
 			}
-			if len(deployment.Spec.ServicesOverride) == 0 {
-				instance.Status.SecretHashes = make(map[string]string, len(deployment.Status.SecretHashes))
-			}
-			for k, v := range deployment.Status.SecretHashes {
-				instance.Status.SecretHashes[k] = v
+			// Skip SecretHashes update for ansibleLimit-scoped deployments
+			// since not all nodes received the secrets.
+			isNodeScoped := deployment.Spec.AnsibleLimit != "" && deployment.Spec.AnsibleLimit != "*"
+			if !isNodeScoped {
+				if len(deployment.Spec.ServicesOverride) == 0 {
+					// Full deployment: reset and replace the entire map.
+					instance.Status.SecretHashes = make(map[string]string, len(deployment.Status.SecretHashes))
+				}
+				for k, v := range deployment.Status.SecretHashes {
+					instance.Status.SecretHashes[k] = v
+				}
 			}
 			for k, v := range deployment.Status.ContainerImages {
 				instance.Status.ContainerImages[k] = v

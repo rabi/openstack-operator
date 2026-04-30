@@ -1613,6 +1613,120 @@ var _ = Describe("Dataplane NodeSet Test", func() {
 			})
 		})
 
+		When("A scoped deployment does not update SecretHashes on NodeSet", func() {
+			var dataSourceSecretName types.NamespacedName
+			var hashTestServiceName types.NamespacedName
+
+			BeforeEach(func() {
+				dataSourceSecretName = types.NamespacedName{
+					Name:      "test-datasource-secret",
+					Namespace: namespace,
+				}
+				hashTestServiceName = types.NamespacedName{
+					Name:      "hash-test-service",
+					Namespace: namespace,
+				}
+
+				nodeSetSpec := DefaultDataPlaneNodeSetSpec("edpm-compute")
+				nodeSetSpec["preProvisioned"] = true
+				nodeSetSpec["services"] = []string{"hash-test-service"}
+
+				th.CreateSecret(dataSourceSecretName, map[string][]byte{
+					"transport_url": []byte("rabbit://nova:old-password@rabbitmq:5672/"),
+				})
+
+				DeferCleanup(th.DeleteInstance, CreateDataPlaneServiceFromSpec(hashTestServiceName, map[string]interface{}{
+					"playbook": "test",
+					"dataSources": []map[string]interface{}{
+						{
+							"secretRef": map[string]interface{}{
+								"name": dataSourceSecretName.Name,
+							},
+						},
+					},
+				}))
+
+				DeferCleanup(th.DeleteInstance, CreateNetConfig(dataplaneNetConfigName, DefaultNetConfigSpec()))
+				DeferCleanup(th.DeleteInstance, CreateDNSMasq(dnsMasqName, DefaultDNSMasqSpec()))
+				DeferCleanup(th.DeleteInstance, CreateDataplaneNodeSet(dataplaneNodeSetName, nodeSetSpec))
+				DeferCleanup(th.DeleteInstance, CreateDataplaneDeployment(dataplaneDeploymentName, DefaultDataPlaneDeploymentSpec()))
+				CreateSSHSecret(dataplaneSSHSecretName)
+				CreateCABundleSecret(caBundleSecretName)
+				SimulateDNSMasqComplete(dnsMasqName)
+				SimulateIPSetComplete(dataplaneNodeName)
+				SimulateDNSDataComplete(dataplaneNodeSetName)
+			})
+
+			It("Should preserve SecretHashes when secret changes and scoped deployment completes", func() {
+				// Complete the full deployment
+				Eventually(func(g Gomega) {
+					ansibleeeName := types.NamespacedName{
+						Name:      "hash-test-service-" + dataplaneDeploymentName.Name + "-" + dataplaneNodeSetName.Name,
+						Namespace: namespace,
+					}
+					ansibleEE := GetAnsibleee(ansibleeeName)
+					ansibleEE.Status.Succeeded = 1
+					g.Expect(th.K8sClient.Status().Update(th.Ctx, ansibleEE)).To(Succeed())
+				}, th.Timeout, th.Interval).Should(Succeed())
+
+				// Wait for SecretHashes to be populated on the nodeset
+				Eventually(func(g Gomega) {
+					instance := GetDataplaneNodeSet(dataplaneNodeSetName)
+					g.Expect(instance.Status.SecretHashes).ShouldNot(BeEmpty())
+					g.Expect(instance.Status.SecretHashes).Should(HaveKey(dataSourceSecretName.Name))
+				}, th.Timeout, th.Interval).Should(Succeed())
+
+				// Capture the SecretHashes after full deployment
+				instance := GetDataplaneNodeSet(dataplaneNodeSetName)
+				savedSecretHashes := make(map[string]string)
+				for k, v := range instance.Status.SecretHashes {
+					savedSecretHashes[k] = v
+				}
+
+				// Modify the secret to simulate credential rotation
+				Eventually(func(g Gomega) {
+					secret := &corev1.Secret{}
+					g.Expect(th.K8sClient.Get(th.Ctx, dataSourceSecretName, secret)).To(Succeed())
+					secret.Data["transport_url"] = []byte("rabbit://nova:new-rotated-password@rabbitmq:5672/")
+					g.Expect(th.K8sClient.Update(th.Ctx, secret)).To(Succeed())
+				}, th.Timeout, th.Interval).Should(Succeed())
+
+				// Create a scoped deployment with ServicesOverride
+				scopedDeploymentName := types.NamespacedName{
+					Name:      "scoped-deployment",
+					Namespace: namespace,
+				}
+				scopedSpec := DefaultDataPlaneDeploymentSpec()
+				scopedSpec["servicesOverride"] = []string{"hash-test-service"}
+				DeferCleanup(th.DeleteInstance, CreateDataplaneDeployment(scopedDeploymentName, scopedSpec))
+
+				// Complete the scoped deployment
+				Eventually(func(g Gomega) {
+					ansibleeeName := types.NamespacedName{
+						Name:      "hash-test-service-" + scopedDeploymentName.Name + "-" + dataplaneNodeSetName.Name,
+						Namespace: namespace,
+					}
+					ansibleEE := GetAnsibleee(ansibleeeName)
+					ansibleEE.Status.Succeeded = 1
+					g.Expect(th.K8sClient.Status().Update(th.Ctx, ansibleEE)).To(Succeed())
+				}, th.Timeout, th.Interval).Should(Succeed())
+
+				// Wait for scoped deployment to be processed
+				Eventually(func(g Gomega) {
+					instance := GetDataplaneNodeSet(dataplaneNodeSetName)
+					g.Expect(instance.Status.DeploymentStatuses).Should(HaveKey(scopedDeploymentName.Name))
+				}, th.Timeout, th.Interval).Should(Succeed())
+
+				// servicesOverride deployments merge SecretHashes (all nodes
+				// were touched), so hashes should be updated.
+				Eventually(func(g Gomega) {
+					instance := GetDataplaneNodeSet(dataplaneNodeSetName)
+					g.Expect(instance.Status.SecretHashes).ShouldNot(BeEmpty())
+					g.Expect(instance.Status.SecretHashes).ShouldNot(Equal(savedSecretHashes))
+				}, th.Timeout, th.Interval).Should(Succeed())
+			})
+		})
+
 		When("Running deployments exist with completed deployment", func() {
 			BeforeEach(func() {
 				nodeSetSpec := DefaultDataPlaneNodeSetSpec("edpm-compute")
