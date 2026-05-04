@@ -32,8 +32,6 @@ import (
 	certmgrv1 "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
 	k8s_networkingv1 "github.com/k8snetworkplumbingwg/network-attachment-definition-client/pkg/apis/k8s.cni.cncf.io/v1"
 	routev1 "github.com/openshift/api/route/v1"
-	rabbitmqv2 "github.com/rabbitmq/cluster-operator/v2/api/v1beta1"
-
 	barbicanv1 "github.com/openstack-k8s-operators/barbican-operator/api/v1beta1"
 	cinderv1 "github.com/openstack-k8s-operators/cinder-operator/api/v1beta1"
 	designatev1 "github.com/openstack-k8s-operators/designate-operator/api/v1beta1"
@@ -182,9 +180,6 @@ var _ = BeforeSuite(func() {
 	barbicanv1CRDs, err := test.GetCRDDirFromModule(
 		"github.com/openstack-k8s-operators/barbican-operator/api", gomod, "bases")
 	Expect(err).ShouldNot(HaveOccurred())
-	rabbitmqv2CRDs, err := test.GetCRDDirFromModule(
-		"github.com/rabbitmq/cluster-operator/v2", gomod, "config/crd/bases")
-	Expect(err).ShouldNot(HaveOccurred())
 	certmgrv1CRDs, err := test.GetOpenShiftCRDDir("cert-manager/v1", gomod)
 	Expect(err).ShouldNot(HaveOccurred())
 	ocpconfigv1CRDs, err := test.GetOpenShiftCRDDir("config/v1", gomod)
@@ -219,7 +214,6 @@ var _ = BeforeSuite(func() {
 			telemetryv1CRDs,
 			designatev1CRDs,
 			barbicanv1CRDs,
-			rabbitmqv2CRDs,
 			certmgrv1CRDs,
 			ocpconfigv1CRDs,
 			watcherCRDs,
@@ -308,8 +302,6 @@ var _ = BeforeSuite(func() {
 	err = designatev1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 	err = barbicanv1.AddToScheme(scheme.Scheme)
-	Expect(err).NotTo(HaveOccurred())
-	err = rabbitmqv2.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
 	err = certmgrv1.AddToScheme(scheme.Scheme)
 	Expect(err).NotTo(HaveOccurred())
