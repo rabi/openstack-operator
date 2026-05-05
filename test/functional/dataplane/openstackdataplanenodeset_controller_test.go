@@ -32,6 +32,7 @@ import (
 	"gopkg.in/yaml.v3"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/ptr"
 )
 
 // Ansible Inventory Structs for testing specific values
@@ -1561,6 +1562,84 @@ var _ = Describe("Dataplane NodeSet Test", func() {
 					instance := GetDataplaneNodeSet(dataplaneNodeSetName)
 					g.Expect(instance.Status.DeploymentStatuses).Should(HaveKey(dataplaneDeploymentName.Name))
 					g.Expect(instance.Status.DeploymentStatuses).Should(HaveKey(secondDeploymentName.Name))
+				}, th.Timeout, th.Interval).Should(Succeed())
+			})
+
+			It("Should copy deployment execution stats into the nodeset status", func() {
+				Eventually(func(g Gomega) {
+					deployment := GetDataplaneDeployment(dataplaneDeploymentName)
+					deployment.Status.AnsibleExecutionSummaries = map[string]dataplanev1.AnsibleExecutionSummary{
+						"bootstrap-" + dataplaneDeploymentName.Name + "-" + dataplaneNodeSetName.Name: {
+							TotalHosts:          ptr.To(3),
+							FailedHosts:         ptr.To(1),
+							UnreachableHosts:    ptr.To(1),
+							FailurePercent:      ptr.To(67),
+							FailedHostList:      &[]string{"host-b"},
+							UnreachableHostList: &[]string{"host-c"},
+						},
+					}
+					g.Expect(th.K8sClient.Status().Update(th.Ctx, deployment)).To(Succeed())
+				}, th.Timeout, th.Interval).Should(Succeed())
+
+				Eventually(func(g Gomega) {
+					deployment := GetDataplaneDeployment(secondDeploymentName)
+					deployment.Status.AnsibleExecutionSummaries = map[string]dataplanev1.AnsibleExecutionSummary{
+						"bootstrap-" + secondDeploymentName.Name + "-" + dataplaneNodeSetName.Name: {
+							TotalHosts:          ptr.To(2),
+							FailedHosts:         ptr.To(0),
+							UnreachableHosts:    ptr.To(0),
+							FailurePercent:      ptr.To(0),
+							FailedHostList:      &[]string{},
+							UnreachableHostList: &[]string{},
+						},
+						"configure-network-" + secondDeploymentName.Name + "-" + dataplaneNodeSetName.Name: {
+							TotalHosts:          ptr.To(2),
+							FailedHosts:         ptr.To(0),
+							UnreachableHosts:    ptr.To(1),
+							FailurePercent:      ptr.To(50),
+							FailedHostList:      &[]string{},
+							UnreachableHostList: &[]string{"host-a"},
+						},
+					}
+					g.Expect(th.K8sClient.Status().Update(th.Ctx, deployment)).To(Succeed())
+				}, th.Timeout, th.Interval).Should(Succeed())
+
+				Eventually(func(g Gomega) {
+					instance := GetDataplaneNodeSet(dataplaneNodeSetName)
+					g.Expect(instance.Status.DeploymentExecutionSummaries).To(HaveKey(dataplaneDeploymentName.Name))
+					g.Expect(instance.Status.DeploymentExecutionSummaries).To(HaveKey(secondDeploymentName.Name))
+					g.Expect(instance.Status.DeploymentExecutionSummaries[dataplaneDeploymentName.Name]).To(Equal(
+						map[string]dataplanev1.AnsibleExecutionSummary{
+							"bootstrap-" + dataplaneDeploymentName.Name + "-" + dataplaneNodeSetName.Name: {
+								TotalHosts:          ptr.To(3),
+								FailedHosts:         ptr.To(1),
+								UnreachableHosts:    ptr.To(1),
+								FailurePercent:      ptr.To(67),
+								FailedHostList:      &[]string{"host-b"},
+								UnreachableHostList: &[]string{"host-c"},
+							},
+						},
+					))
+					g.Expect(instance.Status.DeploymentExecutionSummaries[secondDeploymentName.Name]).To(Equal(
+						map[string]dataplanev1.AnsibleExecutionSummary{
+							"bootstrap-" + secondDeploymentName.Name + "-" + dataplaneNodeSetName.Name: {
+								TotalHosts:          ptr.To(2),
+								FailedHosts:         ptr.To(0),
+								UnreachableHosts:    ptr.To(0),
+								FailurePercent:      ptr.To(0),
+								FailedHostList:      &[]string{},
+								UnreachableHostList: &[]string{},
+							},
+							"configure-network-" + secondDeploymentName.Name + "-" + dataplaneNodeSetName.Name: {
+								TotalHosts:          ptr.To(2),
+								FailedHosts:         ptr.To(0),
+								UnreachableHosts:    ptr.To(1),
+								FailurePercent:      ptr.To(50),
+								FailedHostList:      &[]string{},
+								UnreachableHostList: &[]string{"host-a"},
+							},
+						},
+					))
 				}, th.Timeout, th.Interval).Should(Succeed())
 			})
 		})

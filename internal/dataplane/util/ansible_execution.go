@@ -177,6 +177,72 @@ func GetAnsibleExecution(ctx context.Context,
 	return ansibleEE, nil
 }
 
+// GetAnsibleExecutionSummary retrieves the summary reported by a completed AEE pod.
+func GetAnsibleExecutionSummary(
+	ctx context.Context,
+	helper *helper.Helper,
+	job *batchv1.Job,
+) (*dataplanev1.AnsibleExecutionSummary, error) {
+	podList := &corev1.PodList{}
+	if err := helper.GetClient().List(
+		ctx,
+		podList,
+		client.InNamespace(job.Namespace),
+		client.MatchingLabels{"batch.kubernetes.io/job-name": job.Name},
+	); err != nil {
+		return nil, err
+	}
+
+	sort.Slice(podList.Items, func(i, j int) bool {
+		return podList.Items[j].CreationTimestamp.Before(&podList.Items[i].CreationTimestamp)
+	})
+
+	for _, pod := range podList.Items {
+		summary, err := ParseAnsibleExecutionSummaryFromPod(&pod)
+		if err != nil {
+			return nil, err
+		}
+		if summary != nil {
+			return summary, nil
+		}
+	}
+
+	return nil, nil
+}
+
+// ParseAnsibleExecutionSummaryFromPod parses the AEE pod termination message JSON.
+func ParseAnsibleExecutionSummaryFromPod(
+	pod *corev1.Pod,
+) (*dataplanev1.AnsibleExecutionSummary, error) {
+	for _, containerStatus := range pod.Status.ContainerStatuses {
+		terminated := containerStatus.State.Terminated
+		if terminated == nil {
+			terminated = containerStatus.LastTerminationState.Terminated
+		}
+		if terminated == nil || terminated.Message == "" {
+			continue
+		}
+
+		summary := &dataplanev1.AnsibleExecutionSummary{}
+		if err := json.Unmarshal([]byte(terminated.Message), summary); err != nil {
+			return nil, fmt.Errorf(
+				"failed to parse ansible execution summary for pod %s container %s: %w",
+				pod.Name,
+				containerStatus.Name,
+				err,
+			)
+		}
+
+		if summary.TotalHosts == nil || *summary.TotalHosts == 0 {
+			continue
+		}
+
+		return summary, nil
+	}
+
+	return nil, nil
+}
+
 // GetAnsibleExecutionNameAndLabels Name and Labels of AnsibleEE
 func GetAnsibleExecutionNameAndLabels(service *dataplanev1.OpenStackDataPlaneService,
 	deploymentName string,

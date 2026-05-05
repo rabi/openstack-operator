@@ -117,6 +117,10 @@ type OpenStackDataPlaneNodeSetStatus struct {
 	// DeploymentStatuses
 	DeploymentStatuses map[string]condition.Conditions `json:"deploymentStatuses,omitempty" optional:"true"`
 
+	// DeploymentExecutionSummaries stores the most recent AEE execution summary
+	// per deployment and Job name.
+	DeploymentExecutionSummaries map[string]map[string]AnsibleExecutionSummary `json:"deploymentExecutionSummaries,omitempty" optional:"true"`
+
 	// AllHostnames
 	AllHostnames map[string]map[infranetworkv1.NetNameStr]string `json:"allHostnames,omitempty" optional:"true"`
 
@@ -187,6 +191,7 @@ func (instance OpenStackDataPlaneNodeSet) IsReady() bool {
 func (instance *OpenStackDataPlaneNodeSet) InitConditions() {
 	instance.Status.Conditions = condition.Conditions{}
 	instance.Status.DeploymentStatuses = make(map[string]condition.Conditions)
+	instance.Status.DeploymentExecutionSummaries = make(map[string]map[string]AnsibleExecutionSummary)
 
 	cl := condition.CreateList(
 		condition.UnknownCondition(condition.DeploymentReadyCondition, condition.InitReason, condition.DeploymentReadyInitMessage),
@@ -208,10 +213,10 @@ func (instance *OpenStackDataPlaneNodeSet) InitConditions() {
 // GetAnsibleEESpec - get the fields that will be passed to AEE Job
 func (instance OpenStackDataPlaneNodeSet) GetAnsibleEESpec() AnsibleEESpec {
 	return AnsibleEESpec{
-		NetworkAttachments:        instance.Spec.NetworkAttachments,
-		ExtraMounts:               instance.Spec.NodeTemplate.ExtraMounts,
-		Env:                       instance.Spec.Env,
-		ServiceAccountName:        instance.Name,
+		NetworkAttachments: instance.Spec.NetworkAttachments,
+		ExtraMounts:        instance.Spec.NodeTemplate.ExtraMounts,
+		Env:                instance.Spec.Env,
+		ServiceAccountName: instance.Name,
 	}
 }
 

@@ -132,6 +132,43 @@ spec:
                   type: string
                 description: AnsibleEEHashes
                 type: object
+              ansibleExecutionSummaries:
+                additionalProperties:
+                  description: |-
+                    AnsibleExecutionSummary captures the final ansible-runner execution result
+                    reported by the AEE pod.
+                  properties:
+                    failedHostList:
+                      description: FailedHostList contains the hosts that failed.
+                      items:
+                        type: string
+                      type: array
+                    failedHosts:
+                      description: FailedHosts is the number of hosts with Ansible
+                        task failures.
+                      type: integer
+                    failurePercent:
+                      description: FailurePercent is the percent of total hosts that
+                        failed or were unreachable.
+                      type: integer
+                    totalHosts:
+                      description: TotalHosts is the number of hosts included in the
+                        Ansible execution summary.
+                      type: integer
+                    unreachableHostList:
+                      description: UnreachableHostList contains the hosts that were
+                        unreachable.
+                      items:
+                        type: string
+                      type: array
+                    unreachableHosts:
+                      description: UnreachableHosts is the number of hosts that were
+                        unreachable.
+                      type: integer
+                  type: object
+                description: AnsibleExecutionSummaries stores the most recent AEE
+                  execution summary per Job name.
+                type: object
               bmhRefHashes:
                 additionalProperties:
                   type: string
