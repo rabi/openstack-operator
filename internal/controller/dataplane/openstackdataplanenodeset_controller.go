@@ -133,6 +133,7 @@ func (r *OpenStackDataPlaneNodeSetReconciler) GetLogger(ctx context.Context) log
 
 // RBAC for ImageContentSourcePolicy and MachineConfig
 // +kubebuilder:rbac:groups="operator.openshift.io",resources=imagecontentsourcepolicies,verbs=get;list;watch
+// +kubebuilder:rbac:groups="config.openshift.io",resources=clusterimagepolicies,verbs=get;list;watch
 // +kubebuilder:rbac:groups="config.openshift.io",resources=imagedigestmirrorsets,verbs=get;list;watch
 // +kubebuilder:rbac:groups="config.openshift.io",resources=images,verbs=get;list;watch
 // +kubebuilder:rbac:groups="machineconfiguration.openshift.io",resources=machineconfigs,verbs=get;list;watch

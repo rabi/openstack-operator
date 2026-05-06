@@ -145,26 +145,37 @@ func GenerateNodeSetInventory(ctx context.Context, helper *helper.Helper,
 		registryConfig, err := util.GetMCRegistryConf(ctx, helper)
 		if err != nil {
 			// CRD not installed (non-OpenShift or no MCO) - log warning and continue.
-			// This allows graceful degradation when running on non-OpenShift clusters.
 			// Users can manually configure registries.conf via ansibleVars.
 			if util.IsNoMatchError(err) {
-				helper.GetLogger().Info("Disconnected environment detected but MachineConfig CRD not available. "+
-					"Registry configuration will not be propagated to dataplane nodes. "+
-					"You may need to configure registries.conf manually using ansibleVars "+
-					"(edpm_podman_disconnected_ocp and edpm_podman_registries_conf).",
+				helper.GetLogger().Info("MachineConfig CRD not available; registry config will not be propagated",
 					"error", err.Error())
 			} else {
-				// CRD exists but resource not found, or other errors (network issues,
-				// permissions, etc.) - return the error. If MCO is installed but the
-				// registry MachineConfig doesn't exist, this indicates a misconfiguration.
 				return "", fmt.Errorf("failed to get MachineConfig registry configuration: %w", err)
 			}
 		} else {
 			helper.GetLogger().Info("Mirror registries detected via IDMS/ICSP. Using OCP registry configuration.")
-
-			// Use OCP registries.conf for mirror registry deployments
 			nodeSetGroup.Vars["edpm_podman_registries_conf"] = registryConfig
 			nodeSetGroup.Vars["edpm_podman_disconnected_ocp"] = hasMirrorRegistries
+		}
+
+		mirrorScopes, sourceByMirror, err := util.GetMirrorRegistryScopes(ctx, helper)
+		if err != nil {
+			return "", fmt.Errorf("failed to get mirror registries for sigstore verification: %w", err)
+		}
+
+		sigstorePolicy, err := util.GetSigstoreImagePolicy(ctx, helper, mirrorScopes, sourceByMirror)
+		if err != nil {
+			return "", fmt.Errorf("failed to get ClusterImagePolicy for sigstore verification: %w", err)
+		}
+		if sigstorePolicy != nil {
+			nodeSetGroup.Vars["edpm_container_signature_verification"] = true
+			nodeSetGroup.Vars["edpm_container_signature_registry_mappings"] = sigstorePolicy.RegistryMappings
+			nodeSetGroup.Vars["edpm_container_signature_cosign_key_data"] = sigstorePolicy.CosignKeyData
+			if sigstorePolicy.SignedPrefix != "" {
+				nodeSetGroup.Vars["edpm_container_signature_signed_prefix"] = sigstorePolicy.SignedPrefix
+			}
+		} else {
+			helper.GetLogger().Info("No matching ClusterImagePolicy found; skipping sigstore verification")
 		}
 	}
 
