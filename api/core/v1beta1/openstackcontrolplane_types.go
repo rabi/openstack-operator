@@ -71,11 +71,6 @@ const (
 	DeploymentStageAnnotation = "core.openstack.org/deployment-stage"
 	// DeploymentStageInfrastructureOnly - Annotation value to pause after infrastructure deployment
 	DeploymentStageInfrastructureOnly = "infrastructure-only"
-
-	// ReconcileTriggerAnnotation - Generic annotation to trigger reconciliation and webhook
-	// Value is typically a timestamp to ensure annotation changes trigger updates
-	// Used by controller to trigger UPDATE webhook when needed (e.g., for service name caching)
-	ReconcileTriggerAnnotation = "openstack.org/reconcile-trigger"
 )
 
 // OpenStackControlPlaneSpec defines the desired state of OpenStackControlPlane

@@ -6,6 +6,7 @@ import (
 
 	glancev1 "github.com/openstack-k8s-operators/glance-operator/api/v1beta1"
 	rabbitmqv1 "github.com/openstack-k8s-operators/infra-operator/apis/rabbitmq/v1beta1"
+	"github.com/openstack-k8s-operators/lib-common/modules/common/annotations"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/helper"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/service"
@@ -35,7 +36,7 @@ func ReconcileGlance(ctx context.Context, instance *corev1beta1.OpenStackControl
 	// Trigger webhook to cache service name if UniquePodNames is enabled and not yet cached
 	// This handles operator upgrade scenario where existing CRs don't have ServiceName set
 	if instance.Spec.Glance.UniquePodNames && instance.Spec.Glance.ServiceName == "" {
-		return webhook.EnsureWebhookTrigger(ctx, instance, corev1beta1.ReconcileTriggerAnnotation, "Glance service name caching", Log, 0)
+		return webhook.EnsureWebhookTrigger(ctx, instance, annotations.ReconcileTriggerAnnotation, "Glance service name caching", Log, 0)
 	}
 
 	glanceName, altGlanceName := instance.GetServiceNameCached(corev1beta1.GlanceName, instance.Spec.Glance.UniquePodNames, instance.Spec.Glance.ServiceName)

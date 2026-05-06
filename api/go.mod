@@ -6,17 +6,17 @@ require (
 	github.com/cert-manager/cert-manager v1.16.5
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/onsi/ginkgo/v2 v2.28.2
-	github.com/onsi/gomega v1.39.1
+	github.com/onsi/gomega v1.40.0
 	github.com/openstack-k8s-operators/barbican-operator/api v0.6.1-0.20260420052305-96c3a8196933
 	github.com/openstack-k8s-operators/cinder-operator/api v0.6.1-0.20260418071314-55ff2fc10b0c
 	github.com/openstack-k8s-operators/designate-operator/api v0.6.1-0.20260418051458-40035e96e631
 	github.com/openstack-k8s-operators/glance-operator/api v0.6.1-0.20260418071313-4af756ba3dac
 	github.com/openstack-k8s-operators/heat-operator/api v0.6.1-0.20260420052550-a562e0ee16fd
 	github.com/openstack-k8s-operators/horizon-operator/api v0.6.1-0.20260418053129-fb096ad89dce
-	github.com/openstack-k8s-operators/infra-operator/apis v0.6.1-0.20260416122644-5476763a36b6
+	github.com/openstack-k8s-operators/infra-operator/apis v0.6.1-0.20260507103247-9c1255698eac
 	github.com/openstack-k8s-operators/ironic-operator/api v0.6.1-0.20260420052552-1ba026c533d6
 	github.com/openstack-k8s-operators/keystone-operator/api v0.6.1-0.20260420052838-77f94aef5af2
-	github.com/openstack-k8s-operators/lib-common/modules/common v0.6.1-0.20260417092244-81c71b39e981
+	github.com/openstack-k8s-operators/lib-common/modules/common v0.6.1-0.20260506154724-30a976ba8ef0
 	github.com/openstack-k8s-operators/lib-common/modules/storage v0.6.1-0.20260417092244-81c71b39e981
 	github.com/openstack-k8s-operators/manila-operator/api v0.6.1-0.20260420052836-ac1a4d8a769e
 	github.com/openstack-k8s-operators/mariadb-operator/api v0.6.1-0.20260413152655-564a51226a2a
@@ -32,7 +32,7 @@ require (
 	github.com/rhobs/obo-prometheus-operator/pkg/apis/monitoring v0.77.1-rhobs1 // indirect
 	github.com/rhobs/observability-operator v1.0.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.1 // indirect
+	go.uber.org/zap v1.28.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67
 	golang.org/x/tools v0.41.0 // indirect
 	k8s.io/api v0.31.14

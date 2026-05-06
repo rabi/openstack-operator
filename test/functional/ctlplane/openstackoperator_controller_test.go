@@ -45,6 +45,7 @@ import (
 	topologyv1 "github.com/openstack-k8s-operators/infra-operator/apis/topology/v1beta1"
 
 	"github.com/openstack-k8s-operators/lib-common/modules/certmanager"
+	common_annotations "github.com/openstack-k8s-operators/lib-common/modules/common/annotations"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/service"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/tls"
@@ -4884,7 +4885,7 @@ var _ = Describe("Application Credentials configuration in control plane", func(
 					latest := GetOpenStackControlPlane(openstackcontrolplaneName)
 					annotations := latest.GetAnnotations()
 					if annotations != nil {
-						if val, exists := annotations[corev1.ReconcileTriggerAnnotation]; exists {
+						if val, exists := annotations[common_annotations.ReconcileTriggerAnnotation]; exists {
 							sawAnnotation = true
 							// Verify timestamp format is valid
 							_, err := time.Parse(time.RFC3339, val)
@@ -4913,7 +4914,7 @@ var _ = Describe("Application Credentials configuration in control plane", func(
 					// Annotation should be removed
 					annotations := latest.GetAnnotations()
 					if annotations != nil {
-						_, exists := annotations[corev1.ReconcileTriggerAnnotation]
+						_, exists := annotations[common_annotations.ReconcileTriggerAnnotation]
 						g.Expect(exists).To(BeFalse(),
 							"Annotation should be removed in stable state")
 					}
@@ -4952,7 +4953,7 @@ var _ = Describe("Application Credentials configuration in control plane", func(
 					if annotations == nil {
 						annotations = make(map[string]string)
 					}
-					annotations[corev1.ReconcileTriggerAnnotation] = time.Now().Format(time.RFC3339)
+					annotations[common_annotations.ReconcileTriggerAnnotation] = time.Now().Format(time.RFC3339)
 					annotations["test-webhook-marker"] = "test-added"
 					latest.SetAnnotations(annotations)
 					g.Expect(k8sClient.Update(ctx, latest)).To(Succeed())
@@ -4969,7 +4970,7 @@ var _ = Describe("Application Credentials configuration in control plane", func(
 					latest := GetOpenStackControlPlane(openstackcontrolplaneName)
 					annotations := latest.GetAnnotations()
 					if annotations != nil {
-						_, exists := annotations[corev1.ReconcileTriggerAnnotation]
+						_, exists := annotations[common_annotations.ReconcileTriggerAnnotation]
 						if exists {
 							annotationPersisted = true
 						}
@@ -5001,7 +5002,7 @@ var _ = Describe("Application Credentials configuration in control plane", func(
 					annotations := latest.GetAnnotations()
 
 					if annotations != nil {
-						_, exists := annotations[corev1.ReconcileTriggerAnnotation]
+						_, exists := annotations[common_annotations.ReconcileTriggerAnnotation]
 						if exists {
 							GinkgoWriter.Printf("ERROR: Annotation still exists - webhooks not functioning\n")
 							GinkgoWriter.Printf("Current annotations: %v\n", annotations)

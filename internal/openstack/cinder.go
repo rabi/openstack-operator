@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/openstack-k8s-operators/lib-common/modules/common/annotations"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/helper"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/service"
@@ -27,7 +28,7 @@ func ReconcileCinder(ctx context.Context, instance *corev1beta1.OpenStackControl
 	// Trigger webhook to cache service name if UniquePodNames is enabled and not yet cached
 	// This handles operator upgrade scenario where existing CRs don't have ServiceName set
 	if instance.Spec.Cinder.UniquePodNames && instance.Spec.Cinder.ServiceName == "" {
-		return webhook.EnsureWebhookTrigger(ctx, instance, corev1beta1.ReconcileTriggerAnnotation, "Cinder service name caching", Log, 0)
+		return webhook.EnsureWebhookTrigger(ctx, instance, annotations.ReconcileTriggerAnnotation, "Cinder service name caching", Log, 0)
 	}
 
 	cinderName, altCinderName := instance.GetServiceNameCached(corev1beta1.CinderName, instance.Spec.Cinder.UniquePodNames, instance.Spec.Cinder.ServiceName)

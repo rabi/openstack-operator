@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	keystonev1 "github.com/openstack-k8s-operators/keystone-operator/api/v1beta1"
+	common_annotations "github.com/openstack-k8s-operators/lib-common/modules/common/annotations"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/object"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/route"
 	common_webhook "github.com/openstack-k8s-operators/lib-common/modules/common/webhook"
@@ -235,13 +236,12 @@ func (r *OpenStackControlPlane) ValidateUpdate(ctx context.Context, old runtime.
 	}
 
 	// Handle annotation-triggered migration from controller
-	const reconcileTriggerAnnotation = "openstack.org/reconcile-trigger"
 	if annotations := r.GetAnnotations(); annotations != nil {
-		if _, exists := annotations[reconcileTriggerAnnotation]; exists {
+		if _, exists := annotations[common_annotations.ReconcileTriggerAnnotation]; exists {
 			openstackcontrolplanelog.Info("Reconcile trigger annotation detected, performing migration",
 				"instance", r.Name)
 			r.migrateDeprecatedFields()
-			delete(annotations, reconcileTriggerAnnotation)
+			delete(annotations, common_annotations.ReconcileTriggerAnnotation)
 			r.SetAnnotations(annotations)
 		}
 	}
@@ -1141,7 +1141,7 @@ func (r *OpenStackControlPlane) DefaultServices() {
 			r.Spec.DNS.Template = &networkv1.DNSMasqSpecCore{}
 		}
 
-		r.Spec.DNS.Template.Default()
+		r.Spec.DNS.Template.Default(r.Namespace)
 	}
 
 	// Telemetry
