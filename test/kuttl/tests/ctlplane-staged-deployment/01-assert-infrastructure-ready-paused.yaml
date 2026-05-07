@@ -36,29 +36,14 @@ status:
     type: OpenStackControlPlaneClientReady
   - reason: Init
     status: Unknown
-    type: OpenStackControlPlaneDesignateReady
-  - reason: Init
-    status: Unknown
     type: OpenStackControlPlaneGlanceReady
-  - reason: Init
-    status: Unknown
-    type: OpenStackControlPlaneHeatReady
-  - reason: Init
-    status: Unknown
-    type: OpenStackControlPlaneHorizonReady
   - message: OpenStackControlPlane Infrastructure ready - deployment paused. Remove annotation to resume reconcile of OpenStack services
     reason: Ready
     status: "True"
     type: OpenStackControlPlaneInfrastructureReady
   - reason: Init
     status: Unknown
-    type: OpenStackControlPlaneIronicReady
-  - reason: Init
-    status: Unknown
     type: OpenStackControlPlaneKeystoneAPIReady
-  - reason: Init
-    status: Unknown
-    type: OpenStackControlPlaneManilaReady
   - message: OpenStackControlPlane MariaDB completed
     reason: Ready
     status: "True"
@@ -77,9 +62,6 @@ status:
     reason: Ready
     status: "True"
     type: OpenStackControlPlaneOVNReady
-  - reason: Init
-    status: Unknown
-    type: OpenStackControlPlaneOctaviaReady
   - message: OpenStackControlPlane OpenStackVersion initialized
     reason: Ready
     status: "True"
@@ -93,13 +75,7 @@ status:
     type: OpenStackControlPlaneRabbitMQReady
   - reason: Init
     status: Unknown
-    type: OpenStackControlPlaneRedisReady
-  - reason: Init
-    status: Unknown
     type: OpenStackControlPlaneSwiftReady
   - reason: Init
     status: Unknown
     type: OpenStackControlPlaneTelemetryReady
-  - reason: Init
-    status: Unknown
-    type: OpenStackControlPlaneWatcherReady

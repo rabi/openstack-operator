@@ -1168,43 +1168,92 @@ func (instance *OpenStackControlPlane) InitConditions() {
 	if instance.Status.Conditions == nil {
 		instance.Status.Conditions = condition.Conditions{}
 	}
+
+	// Always-on conditions (no Enabled flag)
 	cl := condition.CreateList(
-		condition.UnknownCondition(OpenStackControlPlaneRabbitMQReadyCondition, condition.InitReason, OpenStackControlPlaneRabbitMQReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneOVNReadyCondition, condition.InitReason, OpenStackControlPlaneOVNReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneNeutronReadyCondition, condition.InitReason, OpenStackControlPlaneNeutronReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneMariaDBReadyCondition, condition.InitReason, OpenStackControlPlaneMariaDBReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneMemcachedReadyCondition, condition.InitReason, OpenStackControlPlaneMemcachedReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneKeystoneAPIReadyCondition, condition.InitReason, OpenStackControlPlaneKeystoneAPIReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlanePlacementAPIReadyCondition, condition.InitReason, OpenStackControlPlanePlacementAPIReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneGlanceReadyCondition, condition.InitReason, OpenStackControlPlaneGlanceReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneCinderReadyCondition, condition.InitReason, OpenStackControlPlaneCinderReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneNovaReadyCondition, condition.InitReason, OpenStackControlPlaneNovaReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneIronicReadyCondition, condition.InitReason, OpenStackControlPlaneIronicReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneClientReadyCondition, condition.InitReason, OpenStackControlPlaneClientReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneManilaReadyCondition, condition.InitReason, OpenStackControlPlaneManilaReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneHorizonReadyCondition, condition.InitReason, OpenStackControlPlaneHorizonReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneDNSReadyCondition, condition.InitReason, OpenStackControlPlaneDNSReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneTelemetryReadyCondition, condition.InitReason, OpenStackControlPlaneTelemetryReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneHeatReadyCondition, condition.InitReason, OpenStackControlPlaneHeatReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneSwiftReadyCondition, condition.InitReason, OpenStackControlPlaneSwiftReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneOctaviaReadyCondition, condition.InitReason, OpenStackControlPlaneOctaviaReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneDesignateReadyCondition, condition.InitReason, OpenStackControlPlaneDesignateReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneBarbicanReadyCondition, condition.InitReason, OpenStackControlPlaneBarbicanReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneRedisReadyCondition, condition.InitReason, OpenStackControlPlaneRedisReadyInitMessage),
 		condition.UnknownCondition(OpenStackControlPlaneCAReadyCondition, condition.InitReason, OpenStackControlPlaneCAReadyInitMessage),
 		condition.UnknownCondition(OpenStackControlPlaneOpenStackVersionInitializationReadyCondition, condition.InitReason, OpenStackControlPlaneOpenStackVersionInitializationReadyInitMessage),
-		condition.UnknownCondition(OpenStackControlPlaneWatcherReadyCondition, condition.InitReason, OpenStackControlPlaneWatcherReadyInitMessage),
 		condition.UnknownCondition(OpenStackControlPlaneInfrastructureReadyCondition, condition.InitReason, OpenStackControlPlaneInfrastructureReadyInitMessage),
 		condition.UnknownCondition(OpenStackControlPlaneBackupConfigReadyCondition, condition.InitReason, OpenStackControlPlaneBackupConfigReadyInitMessage),
-
-		// Also add the overall status condition as Unknown
+		condition.UnknownCondition(OpenStackControlPlaneClientReadyCondition, condition.InitReason, OpenStackControlPlaneClientReadyInitMessage),
 		condition.UnknownCondition(condition.ReadyCondition, condition.InitReason, condition.ReadyInitMessage),
 	)
+
+	// Only init conditions for enabled services to avoid misleading status
+	// when the controller doesn't reach a disabled service's reconciler
+	// (e.g., during minor update gating).
+	if instance.Spec.Rabbitmq.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneRabbitMQReadyCondition, condition.InitReason, OpenStackControlPlaneRabbitMQReadyInitMessage))
+	}
+	if instance.Spec.Ovn.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneOVNReadyCondition, condition.InitReason, OpenStackControlPlaneOVNReadyInitMessage))
+	}
+	if instance.Spec.Neutron.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneNeutronReadyCondition, condition.InitReason, OpenStackControlPlaneNeutronReadyInitMessage))
+	}
+	if instance.Spec.Galera.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneMariaDBReadyCondition, condition.InitReason, OpenStackControlPlaneMariaDBReadyInitMessage))
+	}
+	if instance.Spec.Memcached.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneMemcachedReadyCondition, condition.InitReason, OpenStackControlPlaneMemcachedReadyInitMessage))
+	}
+	if instance.Spec.Keystone.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneKeystoneAPIReadyCondition, condition.InitReason, OpenStackControlPlaneKeystoneAPIReadyInitMessage))
+	}
+	if instance.Spec.Placement.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlanePlacementAPIReadyCondition, condition.InitReason, OpenStackControlPlanePlacementAPIReadyInitMessage))
+	}
+	if instance.Spec.Glance.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneGlanceReadyCondition, condition.InitReason, OpenStackControlPlaneGlanceReadyInitMessage))
+	}
+	if instance.Spec.Cinder.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneCinderReadyCondition, condition.InitReason, OpenStackControlPlaneCinderReadyInitMessage))
+	}
+	if instance.Spec.Nova.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneNovaReadyCondition, condition.InitReason, OpenStackControlPlaneNovaReadyInitMessage))
+	}
+	if instance.Spec.Ironic.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneIronicReadyCondition, condition.InitReason, OpenStackControlPlaneIronicReadyInitMessage))
+	}
+	if instance.Spec.Manila.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneManilaReadyCondition, condition.InitReason, OpenStackControlPlaneManilaReadyInitMessage))
+	}
+	if instance.Spec.Horizon.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneHorizonReadyCondition, condition.InitReason, OpenStackControlPlaneHorizonReadyInitMessage))
+	}
+	if instance.Spec.DNS.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneDNSReadyCondition, condition.InitReason, OpenStackControlPlaneDNSReadyInitMessage))
+	}
+	if instance.Spec.Telemetry.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneTelemetryReadyCondition, condition.InitReason, OpenStackControlPlaneTelemetryReadyInitMessage))
+	}
+	if instance.Spec.Heat.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneHeatReadyCondition, condition.InitReason, OpenStackControlPlaneHeatReadyInitMessage))
+	}
+	if instance.Spec.Swift.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneSwiftReadyCondition, condition.InitReason, OpenStackControlPlaneSwiftReadyInitMessage))
+	}
+	if instance.Spec.Octavia.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneOctaviaReadyCondition, condition.InitReason, OpenStackControlPlaneOctaviaReadyInitMessage))
+	}
+	if instance.Spec.Designate.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneDesignateReadyCondition, condition.InitReason, OpenStackControlPlaneDesignateReadyInitMessage))
+	}
+	if instance.Spec.Barbican.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneBarbicanReadyCondition, condition.InitReason, OpenStackControlPlaneBarbicanReadyInitMessage))
+	}
+	if instance.Spec.Redis.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneRedisReadyCondition, condition.InitReason, OpenStackControlPlaneRedisReadyInitMessage))
+	}
+	if instance.Spec.Watcher.Enabled {
+		cl.Set(condition.UnknownCondition(OpenStackControlPlaneWatcherReadyCondition, condition.InitReason, OpenStackControlPlaneWatcherReadyInitMessage))
+	}
+
 	// Init Topology condition if there's a reference
 	if instance.Spec.TopologyRef != nil {
-		c := condition.UnknownCondition(condition.TopologyReadyCondition, condition.InitReason, condition.TopologyReadyInitMessage)
-		cl.Set(c)
+		cl.Set(condition.UnknownCondition(condition.TopologyReadyCondition, condition.InitReason, condition.TopologyReadyInitMessage))
 	}
+
 	// initialize conditions used later as Status=Unknown
 	instance.Status.Conditions.Init(&cl)
 }
