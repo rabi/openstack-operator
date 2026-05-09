@@ -35,6 +35,7 @@ import (
 	redisv1 "github.com/openstack-k8s-operators/infra-operator/apis/redis/v1beta1"
 	ironicv1 "github.com/openstack-k8s-operators/ironic-operator/api/v1beta1"
 	keystonev1 "github.com/openstack-k8s-operators/keystone-operator/api/v1beta1"
+	"github.com/openstack-k8s-operators/lib-common/modules/common/annotations"
 	"github.com/openstack-k8s-operators/lib-common/modules/common/backup"
 	condition "github.com/openstack-k8s-operators/lib-common/modules/common/condition"
 	common_helper "github.com/openstack-k8s-operators/lib-common/modules/common/helper"
@@ -487,7 +488,7 @@ func (r *OpenStackControlPlaneReconciler) reconcileNormal(ctx context.Context, i
 		ctrlResult, err := webhook.EnsureWebhookTrigger(
 			ctx,
 			instance,
-			openstack.ReconcileTriggerAnnotation,
+			annotations.ReconcileTriggerAnnotation,
 			"messaging bus migration",
 			helper.GetLogger(),
 			5*time.Minute,

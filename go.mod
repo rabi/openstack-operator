@@ -10,7 +10,7 @@ require (
 	github.com/iancoleman/strcase v0.3.0
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v1.7.7
 	github.com/onsi/ginkgo/v2 v2.28.2
-	github.com/onsi/gomega v1.39.1
+	github.com/onsi/gomega v1.40.0
 	github.com/openshift/api v3.9.0+incompatible
 	github.com/openstack-k8s-operators/barbican-operator/api v0.6.1-0.20260420052305-96c3a8196933
 	github.com/openstack-k8s-operators/cinder-operator/api v0.6.1-0.20260418071314-55ff2fc10b0c
@@ -18,12 +18,12 @@ require (
 	github.com/openstack-k8s-operators/glance-operator/api v0.6.1-0.20260418071313-4af756ba3dac
 	github.com/openstack-k8s-operators/heat-operator/api v0.6.1-0.20260420052550-a562e0ee16fd
 	github.com/openstack-k8s-operators/horizon-operator/api v0.6.1-0.20260418053129-fb096ad89dce
-	github.com/openstack-k8s-operators/infra-operator/apis v0.6.1-0.20260416122644-5476763a36b6
+	github.com/openstack-k8s-operators/infra-operator/apis v0.6.1-0.20260507103247-9c1255698eac
 	github.com/openstack-k8s-operators/ironic-operator/api v0.6.1-0.20260420052552-1ba026c533d6
 	github.com/openstack-k8s-operators/keystone-operator/api v0.6.1-0.20260420052838-77f94aef5af2
 	github.com/openstack-k8s-operators/lib-common/modules/ansible v0.6.1-0.20260417092244-81c71b39e981
 	github.com/openstack-k8s-operators/lib-common/modules/certmanager v0.6.1-0.20260417092244-81c71b39e981
-	github.com/openstack-k8s-operators/lib-common/modules/common v0.6.1-0.20260417092244-81c71b39e981
+	github.com/openstack-k8s-operators/lib-common/modules/common v0.6.1-0.20260506154724-30a976ba8ef0
 	github.com/openstack-k8s-operators/lib-common/modules/storage v0.6.1-0.20260417092244-81c71b39e981
 	github.com/openstack-k8s-operators/lib-common/modules/test v0.6.1-0.20260417092244-81c71b39e981
 	github.com/openstack-k8s-operators/manila-operator/api v0.6.1-0.20260420052836-ac1a4d8a769e
@@ -41,7 +41,7 @@ require (
 	github.com/openstack-k8s-operators/watcher-operator/api v0.6.1-0.20260414124111-458e17672b3c
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.11.1
-	go.uber.org/zap v1.27.1
+	go.uber.org/zap v1.28.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.31.14
 	k8s.io/apiextensions-apiserver v0.33.2

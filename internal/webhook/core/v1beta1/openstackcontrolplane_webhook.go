@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
+	common_annotations "github.com/openstack-k8s-operators/lib-common/modules/common/annotations"
 	corev1beta1 "github.com/openstack-k8s-operators/openstack-operator/api/core/v1beta1"
 )
 
@@ -125,8 +126,8 @@ func (d *OpenStackControlPlaneCustomDefaulter) cacheServiceNames(ctx context.Con
 	// Remove it regardless of whether we cached anything to avoid annotation pollution
 	annotations := r.GetAnnotations()
 	if annotations != nil {
-		if _, exists := annotations[corev1beta1.ReconcileTriggerAnnotation]; exists {
-			delete(annotations, corev1beta1.ReconcileTriggerAnnotation)
+		if _, exists := annotations[common_annotations.ReconcileTriggerAnnotation]; exists {
+			delete(annotations, common_annotations.ReconcileTriggerAnnotation)
 			r.SetAnnotations(annotations)
 			if serviceNameCached {
 				openstackcontrolplanelog.Info("Removed reconcile-trigger annotation after caching service name")
