@@ -80,6 +80,23 @@ type OpenStackDataPlaneDeploymentSpec struct {
 	AnsibleEEEnvConfigMapName string `json:"ansibleEEEnvConfigMapName,omitempty"`
 }
 
+// AnsibleExecutionSummary captures the final ansible-runner execution result
+// reported by the AEE pod.
+type AnsibleExecutionSummary struct {
+	// TotalHosts is the number of hosts included in the Ansible execution summary.
+	TotalHosts *int `json:"totalHosts,omitempty" optional:"true"`
+	// FailedHosts is the number of hosts with Ansible task failures.
+	FailedHosts *int `json:"failedHosts,omitempty" optional:"true"`
+	// UnreachableHosts is the number of hosts that were unreachable.
+	UnreachableHosts *int `json:"unreachableHosts,omitempty" optional:"true"`
+	// FailurePercent is the percent of total hosts that failed or were unreachable.
+	FailurePercent *int `json:"failurePercent,omitempty" optional:"true"`
+	// FailedHostList contains the hosts that failed.
+	FailedHostList *[]string `json:"failedHostList,omitempty" optional:"true"`
+	// UnreachableHostList contains the hosts that were unreachable.
+	UnreachableHostList *[]string `json:"unreachableHostList,omitempty" optional:"true"`
+}
+
 // OpenStackDataPlaneDeploymentStatus defines the observed state of OpenStackDataPlaneDeployment
 type OpenStackDataPlaneDeploymentStatus struct {
 	// NodeSetConditions
@@ -87,6 +104,9 @@ type OpenStackDataPlaneDeploymentStatus struct {
 
 	// AnsibleEEHashes
 	AnsibleEEHashes map[string]string `json:"ansibleEEHashes,omitempty" optional:"true"`
+
+	// AnsibleExecutionSummaries stores the most recent AEE execution summary per Job name.
+	AnsibleExecutionSummaries map[string]AnsibleExecutionSummary `json:"ansibleExecutionSummaries,omitempty" optional:"true"`
 
 	// ConfigMapHashes
 	ConfigMapHashes map[string]string `json:"configMapHashes,omitempty" optional:"true"`
@@ -191,6 +211,9 @@ func (instance *OpenStackDataPlaneDeployment) InitHashesAndImages() {
 	}
 	if instance.Status.AnsibleEEHashes == nil {
 		instance.Status.AnsibleEEHashes = make(map[string]string)
+	}
+	if instance.Status.AnsibleExecutionSummaries == nil {
+		instance.Status.AnsibleExecutionSummaries = make(map[string]AnsibleExecutionSummary)
 	}
 	if instance.Status.ContainerImages == nil {
 		instance.Status.ContainerImages = make(map[string]string)

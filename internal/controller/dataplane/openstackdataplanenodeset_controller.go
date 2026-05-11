@@ -540,6 +540,13 @@ func checkDeployment(ctx context.Context, helper *helper.Helper,
 			instance.Status.DeploymentStatuses = make(map[string]condition.Conditions)
 		}
 		instance.Status.DeploymentStatuses[deployment.Name] = deploymentConditions
+		if len(deployment.Status.AnsibleExecutionSummaries) > 0 {
+			if instance.Status.DeploymentExecutionSummaries == nil {
+				instance.Status.DeploymentExecutionSummaries = make(map[string]map[string]dataplanev1.AnsibleExecutionSummary)
+			}
+			deploymentStatus := deployment.Status.DeepCopy()
+			instance.Status.DeploymentExecutionSummaries[deployment.Name] = deploymentStatus.AnsibleExecutionSummaries
+		}
 
 		// Apply filtering for overall nodeset deployment state logic
 		isLatestDeployment := latestRelevantDeployment != nil && deployment.Name == latestRelevantDeployment.Name

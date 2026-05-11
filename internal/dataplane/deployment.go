@@ -231,6 +231,7 @@ func (d *Deployer) ConditionalDeploy(
 				err.Error()))
 		}
 		if ansibleJob.Status.Succeeded > 0 {
+			d.storeExecutionSummary(ansibleJob)
 			log.Info(fmt.Sprintf("Condition %s ready", readyCondition))
 			nsConditions.Set(condition.TrueCondition(
 				readyCondition,
@@ -245,6 +246,7 @@ func (d *Deployer) ConditionalDeploy(
 			if ansibleCondition.Reason == condition.JobReasonBackoffLimitExceeded {
 				errorMsg = fmt.Sprintf("backoff limit reached for execution.name %s execution.namespace %s execution.condition.message: %s", ansibleJob.Name, ansibleJob.Namespace, ansibleCondition.Message)
 			}
+			d.storeExecutionSummary(ansibleJob)
 			log.Info(fmt.Sprintf("Condition %s error", readyCondition))
 			err = fmt.Errorf("%s", errorMsg)
 			nsConditions.Set(condition.FalseCondition(
@@ -265,6 +267,24 @@ func (d *Deployer) ConditionalDeploy(
 	d.Status.NodeSetConditions[d.NodeSet.Name] = nsConditions
 
 	return err
+}
+
+// storeExecutionSummary fetches and stores the ansible execution summary for a
+// completed or failed Job into the deployment status.
+func (d *Deployer) storeExecutionSummary(ansibleJob *batchv1.Job) {
+	log := d.Helper.GetLogger()
+	summary, err := dataplaneutil.GetAnsibleExecutionSummary(d.Ctx, d.Helper, ansibleJob)
+	if err != nil {
+		log.Error(err, "Unable to get ansible execution summary", "execution", ansibleJob.Name)
+		return
+	}
+	if summary == nil {
+		return
+	}
+	if d.Status.AnsibleExecutionSummaries == nil {
+		d.Status.AnsibleExecutionSummaries = make(map[string]dataplanev1.AnsibleExecutionSummary)
+	}
+	d.Status.AnsibleExecutionSummaries[ansibleJob.Name] = *summary
 }
 
 // addCertMounts adds the cert mounts to the aeeSpec for the install-certs service
